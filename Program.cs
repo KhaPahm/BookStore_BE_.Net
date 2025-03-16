@@ -76,6 +76,7 @@ builder.Services.AddScoped<IPublisherRepository, PublisherRepository>();
 builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddScoped<IBookImageRepository, BookImageRepository>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+builder.Services.AddScoped<IUserAddressRepository, UserAddressRepository>();
 
 var app = builder.Build();
 
