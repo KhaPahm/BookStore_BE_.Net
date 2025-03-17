@@ -20,5 +20,8 @@ namespace BookStore.Models
         public Category Category { get; set; }
         public Publisher Publisher { get; set; }
         public ICollection<BookImage> Images { get; set; }
+        public List<ShoppingCart> ShoppingCarts { get; } = new();
+        public List<Review> Reviews { get; set; } = new();
+        public List<OrderDetail> OrderDetails { get; set; } = new();
     }
 }

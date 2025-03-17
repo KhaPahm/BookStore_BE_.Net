@@ -69,3 +69,5 @@ Migrations/
 
 # Resharper
 _ReSharper*
+
+.fake
