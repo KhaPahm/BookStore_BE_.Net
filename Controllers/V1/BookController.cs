@@ -39,6 +39,8 @@ namespace BookStore.Controllers.V1
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById([FromRoute] Guid id) {
             var book = await _bookRepo.GetByIdAsync(id);
+            if(book == null)
+                return NotFound();
             var bookDto = book.ToBookDto();
             return Ok(bookDto);            
         }
