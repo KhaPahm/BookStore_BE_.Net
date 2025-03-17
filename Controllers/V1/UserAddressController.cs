@@ -62,5 +62,16 @@ namespace BookStore.Controllers.V1
             var udModel = userAddressModel.ToUserAddressDto();
             return Ok(udModel);
         }
+
+        [HttpDelete("{id}")]
+        [Authorize]
+        public async Task<IActionResult> Delete([FromRoute] Guid id) {
+            var userAddress = await _userAddressRepo.DeleteAsync(id);
+
+            if(userAddress == null) 
+                return NotFound();
+
+            return NoContent();
+        }
     }
 }

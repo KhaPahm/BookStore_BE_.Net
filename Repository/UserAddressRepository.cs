@@ -25,9 +25,17 @@ namespace BookStore.Repository
             return userAddress;
         }
 
-        public Task<UserAddress> DeleteAsync(Guid userAddressId)
+        public async Task<UserAddress> DeleteAsync(Guid userAddressId)
         {
-            throw new NotImplementedException();
+            var userAddress = await _context.UserAddresses.FirstOrDefaultAsync(ud => ud.Id == userAddressId);
+            
+            if(userAddress == null)
+                return null;
+
+            _context.UserAddresses.Remove(userAddress);
+            await _context.SaveChangesAsync();
+
+            return userAddress;
         }
 
         public async Task<List<UserAddress>> GetAllByUserIdAsync(Guid userId)
