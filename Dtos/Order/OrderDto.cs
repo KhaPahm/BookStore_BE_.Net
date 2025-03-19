@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BookStore.Models
+namespace BookStore.Dtos.Order
 {
-    public class Order
+    public class OrderDto
     {
         public Guid Id { get; set; }
         public double TotalPrice { get; set; }
@@ -14,8 +14,6 @@ namespace BookStore.Models
         public string? SystemNote { get; set; }
         public string PaymentMethod { get; set; } = "Cash"; //Cash-Paypal
         public string? PayPalTransactionId { get; set; } 
-        public Guid UserId { get; set; }
-        public User User { get; set; }
-        public List<OrderDetail> OrderDetails { get; set; } = new();
+        public List<OrderDetailDto> OrderDetails { get; set; }
     }
 }
