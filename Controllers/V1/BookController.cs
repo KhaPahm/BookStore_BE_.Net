@@ -6,6 +6,7 @@ using BookStore.Dtos.Book;
 using BookStore.Interfaces;
 using BookStore.Mappers;
 using BookStore.Models;
+using BookStore.Models.ResponeApi;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -33,16 +34,16 @@ namespace BookStore.Controllers.V1
         public async Task<IActionResult> GetAll() {
             var books = await _bookRepo.GetAllAsync();
             var booksDto = books.Select(b => b.ToBookDto()).ToList();
-            return Ok(booksDto);
+            return Ok(new ApiResponse<List<BookDto>>(200, booksDto));
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById([FromRoute] Guid id) {
             var book = await _bookRepo.GetByIdAsync(id);
             if(book == null)
-                return NotFound();
+                return NotFound(new ApiResponse<string>(404, null, "Couldn't find book.", false));
             var bookDto = book.ToBookDto();
-            return Ok(bookDto);            
+            return Ok(new ApiResponse<BookDto>(200, bookDto));            
         }
 
         [HttpPost]
