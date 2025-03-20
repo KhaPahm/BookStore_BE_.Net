@@ -50,6 +50,8 @@ namespace BookStore.Repository
                 return null;
 
             userAddressModel.Address = userAddress.Address;
+            userAddressModel.Type = userAddress.Type;
+            userAddressModel.IsDefault = userAddress.IsDefault;
             await _context.SaveChangesAsync();
 
             return userAddressModel;

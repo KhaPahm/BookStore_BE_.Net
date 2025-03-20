@@ -6,6 +6,7 @@ using BookStore.Dtos.UserAddress;
 using BookStore.Extensions;
 using BookStore.Interfaces;
 using BookStore.Mappers;
+using BookStore.Models.ResponeApi;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -30,28 +31,28 @@ namespace BookStore.Controllers.V1
             var userAddress = await _userAddressRepo.GetAllByUserIdAsync(userId);
 
             var userAddressDtoList = userAddress.Select(ud => ud.ToUserAddressDto()).ToList();
-            return Ok(userAddressDtoList);
+            return Ok(new ApiResponse<List<UserAddressDto>>(200, userAddressDtoList));
         }
 
         [HttpPost]
         [Authorize]
         public async Task<IActionResult> Create([FromBody] CreateUserAddressDto userAddressDto) {
             if (!ModelState.IsValid) 
-                return BadRequest(ModelState);
+                return BadRequest(new ApiResponse<string>(201, null, "Resquest data isn't suitable", false));
 
             var userId = User.GetUserId();
             var userAddress = userAddressDto.ToUserAddressFromCreateDto();
             userAddress.UserId = userId;
             var newUserAddress = await _userAddressRepo.CreateAsync(userAddress);
 
-            return Ok(newUserAddress.ToUserAddressDto());
+            return Ok(new ApiResponse<UserAddressDto>(201, newUserAddress.ToUserAddressDto()));
         }
 
         [HttpPut("{id}")]
         [Authorize]
         public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] CreateUserAddressDto userAddressDto) {
             if (!ModelState.IsValid) 
-                return BadRequest(ModelState);
+                return BadRequest(new ApiResponse<string>(201, null, "Resquest data isn't suitable", false));
 
             var userAddress = userAddressDto.ToUserAddressFromCreateDto();
 
@@ -60,7 +61,7 @@ namespace BookStore.Controllers.V1
                 return NotFound();
 
             var udModel = userAddressModel.ToUserAddressDto();
-            return Ok(udModel);
+            return Ok(new ApiResponse<UserAddressDto>(200, udModel));
         }
 
         [HttpDelete("{id}")]
@@ -69,9 +70,9 @@ namespace BookStore.Controllers.V1
             var userAddress = await _userAddressRepo.DeleteAsync(id);
 
             if(userAddress == null) 
-                return NotFound();
+                return NotFound(new ApiResponse<string>(404, null, "Couldn't find address", false));
 
-            return NoContent();
+            return Ok(new ApiResponse<string>(204, null));
         }
     }
 }

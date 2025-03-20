@@ -12,13 +12,17 @@ namespace BookStore.Mappers
         public static UserAddressDto ToUserAddressDto(this UserAddress userAddress) {
             return new UserAddressDto {
                 Id = userAddress.Id,
-                Address = userAddress.Address
+                Address = userAddress.Address,
+                Type = userAddress.Type,
+                IsDefault = userAddress.IsDefault
             };
         }
 
         public static UserAddress ToUserAddressFromCreateDto(this CreateUserAddressDto userAddressDto) {
             return new UserAddress {
-                Address = userAddressDto.Address
+                Address = userAddressDto.Address,
+                Type = userAddressDto.Type,
+                IsDefault = userAddressDto.IsDefault
             };
         }
     }

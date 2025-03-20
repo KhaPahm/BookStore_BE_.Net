@@ -9,5 +9,7 @@ namespace BookStore.Dtos.UserAddress
     {
         public Guid Id { get; set; }
         public string Address { get; set; }
+        public string Type { get; set; } = "HOME"; //OFFICE
+        public bool IsDefault { get; set; } = false;
     }
 }
