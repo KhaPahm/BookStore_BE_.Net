@@ -39,6 +39,9 @@ namespace BookStore.Controllers.V1
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById([FromRoute] Guid id) {
+            if(!ModelState.IsValid)
+                return BadRequest(new ApiResponse<string>(400, null, "Id is wrong format.", false));
+
             var book = await _bookRepo.GetByIdAsync(id);
             if(book == null)
                 return NotFound(new ApiResponse<string>(404, null, "Couldn't find book.", false));
@@ -48,6 +51,9 @@ namespace BookStore.Controllers.V1
 
         [HttpPost]
         public async Task<IActionResult> Create([FromForm] CreateBookDto bookDto) {
+            if(!ModelState.IsValid)
+                return BadRequest(new ApiResponse<string>(400, null, "Data respone isn't suitable.", false));
+
             var bookModel = bookDto.ToBookFromCreateBookDto();
             await _bookRepo.CreateAsync(bookModel);
 
@@ -59,18 +65,21 @@ namespace BookStore.Controllers.V1
             bookModel.Category = category;
             bookModel.Images = lstBookImage;
              
-            return CreatedAtAction(nameof(GetById), new {id = bookModel.Id}, bookModel.ToBookDto());
+            return CreatedAtAction(nameof(GetById), new {id = bookModel.Id}, new ApiResponse<BookDto>(201, bookModel.ToBookDto()));
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Update([FromRoute] Guid id, [FromForm] UpdateBookDto bookDto) {
+            if(!ModelState.IsValid)
+                return BadRequest(new ApiResponse<string>(400, null, "Data respone isn't suitable.", false));
+
             var bookModel = bookDto.ToBookFromUpdateBookDto();
 
             var newBookUpdate = await _bookRepo.UpdateAsync(id, bookModel);
             if(newBookUpdate == null)
-                return NotFound("Coudn't find book!");
+                return NotFound(new ApiResponse<string>(404, null, "Coudn't find book!", false));
 
-            return Ok(newBookUpdate.ToBookDto());
+            return Ok(new ApiResponse<BookDto>(200, newBookUpdate.ToBookDto()));
         }
     }
 }
