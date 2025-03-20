@@ -25,7 +25,9 @@ namespace BookStore.Repository
             foreach(var orderDetail in orderDetails) {
                 var book = await _context.Books.FirstAsync(b => b.Id == orderDetail.BookId);
                 orderDetail.PriceAtPurchase = book.Price;
+                book.StockQuantity -= orderDetail.Quantity;
                 await _context.OrderDetails.AddAsync(orderDetail);
+                await _context.SaveChangesAsync();
             }
 
             return orderDetails;
@@ -35,8 +37,9 @@ namespace BookStore.Repository
         {
             var book = await _context.Books.FirstAsync(b => b.Id == orderDetail.BookId);
             orderDetail.PriceAtPurchase = book.Price;
+            book.StockQuantity -= orderDetail.Quantity;
             await _context.OrderDetails.AddAsync(orderDetail);
-
+            await _context.SaveChangesAsync();
             return orderDetail;
         }
     }
