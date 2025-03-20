@@ -10,6 +10,7 @@ namespace BookStore.Interfaces
     {
         public Task<List<Order>> GetAsync(Guid userId);
         public Task<Order> GetByIdAsync(Guid userId, Guid orderId);
+        public Order GetById(Guid userId, Guid orderId);
         public Task<Order> CreateAysnc(Order order);
         public Task<Order> UpdateTotalPriceAsync(Guid orderId, double totalPrice);
     }

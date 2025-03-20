@@ -6,6 +6,7 @@ using BookStore.Dtos.Order;
 using BookStore.Extensions;
 using BookStore.Interfaces;
 using BookStore.Mappers;
+using BookStore.Models.ResponeApi;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -50,29 +51,51 @@ namespace BookStore.Controllers.V1
         }
         
 
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateOrderDto orderDto) {
-            if(ModelState.IsValid == false)
-                return BadRequest(ModelState);
+        // [HttpPost]
+        // public async Task<IActionResult> Create([FromBody] CreateOrderDto orderDto) {
+        //     if(ModelState.IsValid == false)
+        //         return BadRequest(ModelState);
+
+        //     var userId = User.GetUserId();
+        //     var order = orderDto.ToOderFromDto(userId);
+
+        //     await _orderRepo.CreateAysnc(order);
+
+        //     var orderDetails = orderDto.OrderDetailDtos
+        //         .Select(od => od.ToOderDetailFromDto(order.Id))
+        //         .ToList();
+
+        //     await _orderDetailRepo.CreateAsync(orderDetails);
+            
+        //     var totalPrice = orderDetails.Sum(od => od.PriceAtPurchase);
+
+        //     await _orderRepo.UpdateTotalPriceAsync(order.Id, totalPrice);
+
+        //     var newOrder = await _orderRepo.GetByIdAsync(userId, order.Id);
+
+        //     return CreatedAtAction(nameof(GetById), new {id = newOrder.Id}, newOrder.ToOrderDto());
+        // }
+
+        [HttpPost("now")]
+        public async Task<IActionResult> CreateNow([FromBody] CreateOrderNowDto orderDto) {
+            if(!ModelState.IsValid)
+                return BadRequest(new ApiResponse<string>(400, null, "Request data is wrong structure.", false));
 
             var userId = User.GetUserId();
-            var order = orderDto.ToOderFromDto(userId);
-
+            var order = orderDto.ToOrderFromDto(userId);
+            order.Status = order.Status.ToUpper();
+            order.PaymentMethod = order.PaymentMethod.ToUpper();
             await _orderRepo.CreateAysnc(order);
 
-            var orderDetails = orderDto.OrderDetailDtos
-                .Select(od => od.ToOderDetailFromDto(order.Id))
-                .ToList();
+            var orderDetailDto = orderDto.OrderDetail;
+            var orderDetail = orderDetailDto.ToOderDetailFromDto(order.Id);
+            await _orderDetailRepo.CreateAsync(orderDetail);
 
-            await _orderDetailRepo.CreateAsync(orderDetails);
-            
-            var totalPrice = orderDetails.Sum(od => od.PriceAtPurchase);
-
+            var totalPrice = orderDetail.Quantity * orderDetail.PriceAtPurchase;
             await _orderRepo.UpdateTotalPriceAsync(order.Id, totalPrice);
 
             var newOrder = await _orderRepo.GetByIdAsync(userId, order.Id);
-
-            return CreatedAtAction(nameof(GetById), new {id = newOrder.Id}, newOrder.ToOrderDto());
+            return CreatedAtAction(nameof(GetById), new {id = newOrder.Id}, new ApiResponse<OrderDto>(201, newOrder.ToOrderDto()));
         }
     }
 }

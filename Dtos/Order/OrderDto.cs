@@ -14,6 +14,7 @@ namespace BookStore.Dtos.Order
         public string? SystemNote { get; set; }
         public string PaymentMethod { get; set; } = "Cash"; //Cash-Paypal
         public string? PayPalTransactionId { get; set; } 
+        public DateTime? MyProperty { get; set; }
         public List<OrderDetailDto> OrderDetails { get; set; }
     }
 }

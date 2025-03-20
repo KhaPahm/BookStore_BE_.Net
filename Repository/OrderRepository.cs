@@ -24,7 +24,7 @@ namespace BookStore.Repository
             await _context.SaveChangesAsync();
             return order;
         }
-
+        
         public async Task<List<Order>> GetAsync(Guid userId)
         {
             var orders = await _context.Orders
@@ -41,6 +41,23 @@ namespace BookStore.Repository
             return orders;
         }
 
+        public Order GetById(Guid userId, Guid orderId)
+        {
+            var order = _context.Orders
+                                .Include(o => o.OrderDetails)
+                                    .ThenInclude(od => od.Book)
+                                        .ThenInclude(od => od.Category)
+                                .Include(o => o.OrderDetails)
+                                    .ThenInclude(od => od.Book)
+                                        .ThenInclude(od => od.Publisher)
+                                .Include(o => o.OrderDetails)
+                                    .ThenInclude(od => od.Book)
+                                        .ThenInclude(od => od.Images)
+                                .FirstOrDefault(o => o.UserId == userId && o.Id == orderId);
+
+            return order;
+        }
+
         public async Task<Order?> GetByIdAsync(Guid userId, Guid orderId)
         {
             var order = await _context.Orders
@@ -53,7 +70,14 @@ namespace BookStore.Repository
                                 .Include(o => o.OrderDetails)
                                     .ThenInclude(od => od.Book)
                                         .ThenInclude(od => od.Images)
-                                .FirstOrDefaultAsync(o => o.UserId == userId && o.Id == orderId);
+                                .FirstOrDefaultAsync(o => o.UserId == userId && o.Id == orderId)
+                                .ConfigureAwait(true);
+
+            // var order = await _context.Orders
+            //             .Where(o => o.UserId == userId && o.Id == orderId)
+            //             .Select(o => o)
+            //             .FirstOrDefaultAsync();
+                        
             return order;
         }
 

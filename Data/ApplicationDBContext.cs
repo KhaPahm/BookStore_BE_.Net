@@ -58,7 +58,7 @@ public class ApplicationDBContext : DbContext
                     .HasForeignKey(r => r.UserId);
         #endregion
 
-        #region ""
+        #region "OrderDetail Entity"
         modelBuilder.Entity<OrderDetail>(o => o.HasKey(k => new {k.BookId, k.OrderId}));
         modelBuilder.Entity<OrderDetail>()
                     .HasOne(b => b.Book)
@@ -68,6 +68,19 @@ public class ApplicationDBContext : DbContext
                     .HasOne(o => o.Order)
                     .WithMany(o => o.OrderDetails)
                     .HasForeignKey(od => od.OrderId);
-        #endregion        
+        #endregion     
+
+        // #region "Order Entiry"
+        // modelBuilder.Entity<Order>(o => o.HasKey(k => k.Id));
+        // modelBuilder.Entity<Order>()
+        //             .HasOne(o => o.User)
+        //             .WithMany(u => u.Orders)
+        //             .HasForeignKey(o => o.UserId);
+        // modelBuilder.Entity<Order>()
+        //             .HasOne(o => o.UserAddressId)
+        //             .WithMany(u => u.Orders)
+        //             .HasForeignKey(o => o.UserId);
+
+        // #endregion   
     }
 }

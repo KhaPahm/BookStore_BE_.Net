@@ -14,6 +14,8 @@ namespace BookStore.Models
         public string? SystemNote { get; set; }
         public string PaymentMethod { get; set; } = "Cash"; //Cash-Paypal
         public string? PayPalTransactionId { get; set; } 
+        public DateTime OrderDate { get; set; } = DateTime.Now;
+        public string? UserAddress { get; set; } = "";
         public Guid UserId { get; set; }
         public User User { get; set; }
         public List<OrderDetail> OrderDetails { get; set; } = new();

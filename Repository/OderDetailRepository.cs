@@ -30,5 +30,14 @@ namespace BookStore.Repository
 
             return orderDetails;
         }
+
+        public async Task<OrderDetail> CreateAsync(OrderDetail orderDetail)
+        {
+            var book = await _context.Books.FirstAsync(b => b.Id == orderDetail.BookId);
+            orderDetail.PriceAtPurchase = book.Price;
+            await _context.OrderDetails.AddAsync(orderDetail);
+
+            return orderDetail;
+        }
     }
 }

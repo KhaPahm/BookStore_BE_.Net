@@ -30,5 +30,14 @@ namespace BookStore.Mappers
                 OrderDetails = order.OrderDetails.Select(od => od.ToOrderDetailDto()).ToList()
             };
         }
+
+        public static Order ToOrderFromDto(this CreateOrderNowDto orderNowDto, Guid userId) {
+            return new Order {
+                UserNote = orderNowDto.UserNote,
+                PaymentMethod = orderNowDto.PaymentMethod,
+                PayPalTransactionId = orderNowDto.PayPalTransactionId,
+                UserId = userId
+            };
+        }
     }
 }
