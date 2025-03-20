@@ -14,6 +14,7 @@ namespace BookStore.Mappers
                 UserNote = orderDto.UserNote,
                 PaymentMethod = orderDto.PaymentMethod,
                 PayPalTransactionId = orderDto.PayPalTransactionId,
+                ShippingAddress = orderDto.ShippingAddress,
                 UserId = userId
             };
         }

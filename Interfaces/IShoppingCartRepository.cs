@@ -12,5 +12,6 @@ namespace BookStore.Interfaces
         public Task<ShoppingCart> CreateAsync(ShoppingCart shoppingCart);
         public Task<ShoppingCart> UpdateAsync(ShoppingCart shoppingCart);
         public Task<ShoppingCart> DeleteAsync(Guid userId, Guid bookId);
+        public Task ClearAsync(Guid userId);
     }
 }

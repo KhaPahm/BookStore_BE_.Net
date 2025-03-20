@@ -24,5 +24,14 @@ namespace BookStore.Mappers
                 PriceAtPurchase = orderDetail.PriceAtPurchase
             };
         }
+
+        public static OrderDetail ToOrderDetailFromShoppingCart(this ShoppingCart shoppingCart, Guid orderId) {
+            return new OrderDetail {
+                OrderId = orderId,
+                BookId = shoppingCart.BookId,
+                Quantity = shoppingCart.Quantity,
+                PriceAtPurchase = shoppingCart.Book.Price
+            };
+        }
     }
 }

@@ -6,6 +6,7 @@ using BookStore.Dtos.Order;
 using BookStore.Extensions;
 using BookStore.Interfaces;
 using BookStore.Mappers;
+using BookStore.Models;
 using BookStore.Models.ResponeApi;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,11 +20,13 @@ namespace BookStore.Controllers.V1
     {
         private readonly IOrderRepository _orderRepo;
         private readonly IOrderDetailRepository _orderDetailRepo;
+        private readonly IShoppingCartRepository _shoppingCart;
 
-        public OrderController(IOrderRepository orderRepo, IOrderDetailRepository orderDetailRepo)
+        public OrderController(IOrderRepository orderRepo, IOrderDetailRepository orderDetailRepo, IShoppingCartRepository shoppingCart)
         {
             _orderRepo = orderRepo;
             _orderDetailRepo = orderDetailRepo;
+            _shoppingCart = shoppingCart;
         }
 
         [HttpGet]
@@ -96,6 +99,34 @@ namespace BookStore.Controllers.V1
 
             var newOrder = await _orderRepo.GetByIdAsync(userId, order.Id);
             return CreatedAtAction(nameof(GetById), new {id = newOrder.Id}, new ApiResponse<OrderDto>(201, newOrder.ToOrderDto()));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateFromShippingCart([FromBody]CreateOrderDto createOrder) {
+            if(!ModelState.IsValid)
+                return BadRequest(new ApiResponse<string>(400, null, "Request data is wrong structure.", false));
+            
+            var userId = User.GetUserId();
+
+            var shoppingCarts = await _shoppingCart.GetAllByUserIdAsync(userId);
+            if(shoppingCarts.Count == 0)
+                return BadRequest(new ApiResponse<string>(400, null, "Your shopping cart is null.", false));
+
+            var order = createOrder.ToOderFromDto(userId);
+            order.Status = order.Status.ToUpper();
+            order.PaymentMethod = order.PaymentMethod.ToUpper();
+            await _orderRepo.CreateAysnc(order);
+
+            var orderDetails = shoppingCarts.Select(sc => sc.ToOrderDetailFromShoppingCart(order.Id)).ToList();
+            await _orderDetailRepo.CreateAsync(orderDetails);
+            await _shoppingCart.ClearAsync(userId);
+
+            var totalPrice = orderDetails.Sum(od => od.PriceAtPurchase*od.Quantity);
+
+            await _orderRepo.UpdateTotalPriceAsync(order.Id, totalPrice);
+
+            var newOrder = await _orderRepo.GetByIdAsync(userId, order.Id);
+            return CreatedAtAction(nameof(GetById), new {id = newOrder.Id}, newOrder.ToOrderDto());
         }
     }
 }

@@ -18,6 +18,16 @@ namespace BookStore.Repository
             _context = context;
         }
 
+        public async Task ClearAsync(Guid userId)
+        {
+            var shoppingCarts = await _context.ShoppingCarts.Where(sc => sc.UserId == userId).ToListAsync();
+            foreach(var sc in shoppingCarts) {
+                _context.ShoppingCarts.Remove(sc);
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<ShoppingCart?> CreateAsync(ShoppingCart shoppingCart)
         {
             var book = await _context.Books.FirstOrDefaultAsync(b => b.Id == shoppingCart.BookId);
