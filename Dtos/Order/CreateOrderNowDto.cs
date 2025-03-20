@@ -10,6 +10,7 @@ namespace BookStore.Dtos.Order
         public string? UserNote { get; set; }
         public string PaymentMethod { get; set; } = "Cash";
         public string? PayPalTransactionId { get; set; } 
+        public string ShippingAddress { get; set; } = "";
         public CreateOrderDetailDto OrderDetail { get; set; }
     }
 }
