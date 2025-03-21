@@ -81,13 +81,19 @@ namespace BookStore.Repository
             return order;
         }
 
+        public async Task<Order> UpdateShippingAddress(Guid orderId, string address)
+        {
+            var order = await _context.Orders.FirstAsync(o => o.Id == orderId);
+            order.ShippingAddress = address;
+            await _context.SaveChangesAsync();
+            return order;
+        }
+
         public async Task<Order> UpdateTotalPriceAsync(Guid orderId, double totalPrice)
         {
             var order = await _context.Orders.FirstAsync(O => O.Id == orderId);
-                            
             order.TotalPrice = totalPrice;
             await _context.SaveChangesAsync();
-
             return order;
         }
     }

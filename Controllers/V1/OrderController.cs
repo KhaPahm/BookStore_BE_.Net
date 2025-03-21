@@ -128,5 +128,25 @@ namespace BookStore.Controllers.V1
             var newOrder = await _orderRepo.GetByIdAsync(userId, order.Id);
             return CreatedAtAction(nameof(GetById), new {id = newOrder.Id}, newOrder.ToOrderDto());
         }
+
+        [HttpPatch("{orderId}")]
+        public async Task<IActionResult> UpdateAddress([FromRoute] Guid orderId, [FromBody] UpdateOrderAddressDto updateOrderAddressDto) {
+            if(!ModelState.IsValid)
+                return BadRequest(new ApiResponse<string>(400, null, "Request data is wrong structure.", false));
+            
+            var userId = User.GetUserId();
+
+            var order = await _orderRepo.GetByIdAsync(userId, orderId);
+            if(order == null)
+                return NotFound(new ApiResponse<string>(404, null, "Couldn't find the order.", false));
+
+            if(order.Status.ToUpper() != "PREPARE") {
+                return BadRequest(new ApiResponse<string>(400, null, "Your order was shipped so you couldn't update your address.", false));
+            }
+
+            var newOrder = await _orderRepo.UpdateShippingAddress(order.Id, updateOrderAddressDto.ShippingAddress);
+
+            return Ok(new ApiResponse<OrderDto>(200, newOrder.ToOrderDto()));
+        }
     }
 }
