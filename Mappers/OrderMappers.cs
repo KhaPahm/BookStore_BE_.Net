@@ -28,6 +28,7 @@ namespace BookStore.Mappers
                 SystemNote = order.SystemNote,
                 PaymentMethod = order.PaymentMethod,
                 PayPalTransactionId = order.PayPalTransactionId,
+                ShippingAddress = order.ShippingAddress,
                 OrderDetails = order.OrderDetails.Select(od => od.ToOrderDetailDto()).ToList()
             };
         }
