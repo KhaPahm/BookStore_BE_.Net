@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BookStore.Data;
+using BookStore.Dtos.Order;
 using BookStore.Interfaces;
 using BookStore.Models;
 using Microsoft.EntityFrameworkCore;
@@ -106,6 +107,20 @@ namespace BookStore.Repository
             order.TotalPrice = totalPrice;
             await _context.SaveChangesAsync();
             return order;
+        }
+
+        public async Task<Order> UpdateOrderStatusAsycn(Guid orderId, StaffUpdateOrderStatusDto orderStatusDto)
+        {
+            var order = await _context.Orders.FirstAsync(O => O.Id == orderId);
+            order.Status = orderStatusDto.Status;
+            order.SystemNote = orderStatusDto.SystemNote;
+            await _context.SaveChangesAsync();
+            return order;
+        }
+
+        public async Task<Order?> GetByIdAsync(Guid orderId)
+        {
+            return await _context.Orders.FirstOrDefaultAsync(o => o.Id == orderId);
         }
     }
 }

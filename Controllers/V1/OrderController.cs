@@ -8,6 +8,7 @@ using BookStore.Interfaces;
 using BookStore.Mappers;
 using BookStore.Models;
 using BookStore.Models.ResponeApi;
+using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -165,6 +166,26 @@ namespace BookStore.Controllers.V1
             var orderUpdated = await _orderRepo.UserCancelOrderAsync(orderId, updateOrderStatusDto.CancelReason);
 
             return Ok(new ApiResponse<OrderDto>(200, orderUpdated.ToOrderDto()));
+        }
+
+        [HttpPatch("update-status/{orderId}")]
+        [Authorize(Roles = "ADMIN, STAFF")]
+        public async Task<IActionResult> UpdateStatus([FromRoute] Guid orderId, [FromBody] StaffUpdateOrderStatusDto updateOrderStatusDto) {
+            if(!ModelState.IsValid)
+                return BadRequest(new ApiResponse<string>(400, null, "Request data is wrong structure.", false));
+            
+            string[] statusList = {"CREATED", "PREPARING", "SHIPPING", "COMPLETED", "CANCELING", "CANCELED"};
+            if(!statusList.Contains(updateOrderStatusDto.Status)) 
+                return BadRequest(new ApiResponse<string>(400, null, "Status have to in list [\"CREATED\", \"PREPARING\", \"SHIPPING\", \"COMPLETED\", \"CANCELING\", \"CANCELED\"]", false));
+
+            var userId = User.GetUserId();
+            var order = await _orderRepo.GetByIdAsync(orderId);
+            if(order == null)
+                return NotFound(new ApiResponse<string>(404, null, "Couldn't find the order.", false));
+
+            var orderUpdated = await _orderRepo.UpdateOrderStatusAsycn(order.Id, updateOrderStatusDto);
+
+            return Ok(new ApiResponse<OrderDto>(200, orderUpdated.ToOrderDto())); 
         }
     }
 }
