@@ -12,10 +12,21 @@ namespace BookStore.Repository
     public class OrderRepository : IOrderRepository
     {
         private readonly ApplicationDBContext _context;
-
         public OrderRepository(ApplicationDBContext context)
         {
             _context = context;
+        }
+
+        public async Task<Order> UserCancelOrderAsync(Guid orderId, string cancelReason)
+        {
+            var order = await _context.Orders.FirstAsync(o => o.Id == orderId);
+
+            order.Status = "CANCELING";
+            order.CancelReason = cancelReason;
+
+            await _context.SaveChangesAsync();
+
+            return order;
         }
 
         public async Task<Order> CreateAysnc(Order order)

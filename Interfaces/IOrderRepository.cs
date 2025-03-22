@@ -14,5 +14,6 @@ namespace BookStore.Interfaces
         public Task<Order> CreateAysnc(Order order);
         public Task<Order> UpdateTotalPriceAsync(Guid orderId, double totalPrice);
         public Task<Order> UpdateShippingAddress(Guid orderId, string address);
+        public Task<Order> UserCancelOrderAsync(Guid orderId, string cancelReason);
     }
 }

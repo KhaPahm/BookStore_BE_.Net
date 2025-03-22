@@ -148,5 +148,23 @@ namespace BookStore.Controllers.V1
 
             return Ok(new ApiResponse<OrderDto>(200, newOrder.ToOrderDto()));
         }
+    
+        [HttpPatch("cancel/{orderId}")]
+        [Authorize(Roles = "CUSTOMER")]
+        public async Task<IActionResult> UpdateState([FromRoute] Guid orderId, [FromBody] UpdateOrderStatusDto updateOrderStatusDto) {
+            var userId = User.GetUserId();
+
+            var order = await _orderRepo.GetByIdAsync(userId, orderId);
+            if(order == null)
+                return NotFound(new ApiResponse<string>(404, null, "Couldn't find the order.", false));
+            
+            if(order.Status.ToUpper() != "PREPARE" && order.Status.ToUpper() != "CREATED") {
+                return BadRequest(new ApiResponse<string>(400, null, "Your order was already sent so you couldn't cancel it.", false));
+            }
+
+            var orderUpdated = await _orderRepo.UserCancelOrderAsync(orderId, updateOrderStatusDto.CancelReason);
+
+            return Ok(new ApiResponse<OrderDto>(200, orderUpdated.ToOrderDto()));
+        }
     }
 }

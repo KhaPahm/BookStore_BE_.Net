@@ -25,6 +25,7 @@ namespace BookStore.Mappers
                 TotalPrice = order.TotalPrice,
                 Status = order.Status,
                 UserNote = order.UserNote,
+                CancelReason = order.CancelReason,
                 SystemNote = order.SystemNote,
                 PaymentMethod = order.PaymentMethod,
                 PayPalTransactionId = order.PayPalTransactionId,
