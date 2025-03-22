@@ -20,5 +20,9 @@ namespace BookStore.Extensions
 
             return id;
         }
+
+        public static string GetUserRole(this ClaimsPrincipal user) {
+            return user.Claims.Single(x => x.Type.Equals("http://schemas.microsoft.com/ws/2008/06/identity/claims/role")).Value;
+        }
     }
 }
