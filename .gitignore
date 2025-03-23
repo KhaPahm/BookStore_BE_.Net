@@ -71,3 +71,5 @@ Migrations/
 _ReSharper*
 
 .fake
+
+.sql
