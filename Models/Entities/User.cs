@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
+using BookStore.Models.Entities;
 
 namespace BookStore.Models
 {
@@ -26,5 +27,7 @@ namespace BookStore.Models
         public List<ShoppingCart> ShoppingCarts { get; set; } = new();
         public List<Review> Reviews { get; set; } = new();
         public List<Order> Orders { get; set; }
+        public List<ReviewReply> ReviewReplies { get; set; } = new();
+        public List<ReviewLike> ReviewLikes { get; set; } = new();
     }
 }

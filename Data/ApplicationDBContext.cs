@@ -1,5 +1,6 @@
 using System;
 using BookStore.Models;
+using BookStore.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookStore.Data;
@@ -23,6 +24,8 @@ public class ApplicationDBContext : DbContext
     public DbSet<Review> Reviews { get; set; }
     public DbSet<Order> Orders { get; set; }
     public DbSet<OrderDetail> OrderDetails { get; set; }
+    public DbSet<ReviewReply> ReviewReplies { get; set; }
+    public DbSet<ReviewLike> ReviewLikes { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -70,17 +73,33 @@ public class ApplicationDBContext : DbContext
                     .HasForeignKey(od => od.OrderId);
         #endregion     
 
-        // #region "Order Entiry"
-        // modelBuilder.Entity<Order>(o => o.HasKey(k => k.Id));
-        // modelBuilder.Entity<Order>()
-        //             .HasOne(o => o.User)
-        //             .WithMany(u => u.Orders)
-        //             .HasForeignKey(o => o.UserId);
-        // modelBuilder.Entity<Order>()
-        //             .HasOne(o => o.UserAddressId)
-        //             .WithMany(u => u.Orders)
-        //             .HasForeignKey(o => o.UserId);
+        #region  "Review Reply Entity"
+        modelBuilder.Entity<ReviewReply>()
+                    .HasOne(rv => rv.Review)
+                    .WithMany(rv => rv.ReviewReplies)
+                    .HasForeignKey(r => r.ReviewId)
+                    .OnDelete(DeleteBehavior.NoAction);
 
-        // #endregion   
+        modelBuilder.Entity<ReviewReply>()
+                    .HasOne(rv => rv.User)
+                    .WithMany(u => u.ReviewReplies)
+                    .HasForeignKey(rv => rv.UserId)
+                    .OnDelete(DeleteBehavior.NoAction);
+        #endregion
+
+        #region  "Review Like Entity"
+        modelBuilder.Entity<ReviewLike>(x => x.HasKey(rv => new {rv.ReviewId, rv.UserId} ));
+        modelBuilder.Entity<ReviewLike>()
+                    .HasOne(rv => rv.Review)
+                    .WithMany(rv => rv.ReviewLikes)
+                    .HasForeignKey(r => r.ReviewId)
+                    .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<ReviewLike>()
+                    .HasOne(rv => rv.User)
+                    .WithMany(u => u.ReviewLikes)
+                    .HasForeignKey(rv => rv.UserId)
+                    .OnDelete(DeleteBehavior.NoAction);
+        #endregion
     }
 }
