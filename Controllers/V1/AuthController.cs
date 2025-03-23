@@ -1,9 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using BookStore.Dtos.Auth;
 using BookStore.Interfaces;
+using BookStore.Mappers;
+using BookStore.Models;
+using BookStore.Models.ResponeApi;
+using BookStore.Static;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookStore.Controllers.V1
@@ -68,6 +75,44 @@ namespace BookStore.Controllers.V1
                     Token = accessToken
                 }
             );
+        }
+    
+        [HttpGet("login/google")]
+        public IActionResult GoogleLogin() {
+            var properties = new AuthenticationProperties { RedirectUri = Url.Action("GoogleResponse") };
+            return Challenge(properties, GoogleDefaults.AuthenticationScheme);
+        }
+
+        [HttpGet("google-response")]
+        public async Task<IActionResult> GoogleResponse() {
+            var authenticateResult = await HttpContext.AuthenticateAsync();
+
+            if(!authenticateResult.Succeeded) {
+                return Unauthorized();
+            }
+
+            var claims = authenticateResult.Principal.Identities
+                .FirstOrDefault()?.Claims.Select(c => new {c.Type, c.Value});
+
+            var claimId = claims.FirstOrDefault(c => c.Type.ToString() == ClaimTypes.NameIdentifier);
+
+            var user = await _authRepo.GetUserByProviderIdAsync(claimId.Value, AuthProvider.Google);
+
+            if (user == null) {
+                user = new User {
+                    Id = new(),
+                    FullName = claims.First(c => c.Type.ToString() == ClaimTypes.Name).Value,
+                    Email = claims.First(c => c.Type.ToString() == ClaimTypes.Email).Value,
+                    AuthProvider = AuthProvider.Google,
+                    Role = UserRole.Customer,
+                };
+
+                await _authRepo.RegisterUser(user);
+            }
+            
+            var accessToken = _jwtService.GenerateToken(user);
+
+            return Ok(new ApiResponse<UserDto>(200, user.ToUserDto(accessToken), "Login successful"));
         }
     }
 }

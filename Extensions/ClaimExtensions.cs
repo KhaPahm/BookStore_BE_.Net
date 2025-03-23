@@ -24,5 +24,13 @@ namespace BookStore.Extensions
         public static string GetUserRole(this ClaimsPrincipal user) {
             return user.Claims.Single(x => x.Type.Equals("http://schemas.microsoft.com/ws/2008/06/identity/claims/role")).Value;
         }
+
+        public static string GetEmail(this ClaimsPrincipal user) {
+            return user.Claims.Single(x => x.Type.Equals("http://schemas.microsoft.com/ws/2008/06/identity/claims/emailaddress")).Value;
+        }
+
+        public static string GetName(this ClaimsPrincipal user) {
+            return user.Claims.Single(x => x.Type.Equals("http://schemas.microsoft.com/ws/2008/06/identity/claims/name")).Value;
+        }
     }
 }

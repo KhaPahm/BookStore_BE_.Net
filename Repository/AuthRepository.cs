@@ -22,6 +22,11 @@ namespace BookStore.Repository
             return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
         }
 
+        public async Task<User?> GetUserByProviderIdAsync(string providerId, string authProvider)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.ProviderId == providerId && u.AuthProvider == authProvider);
+        }
+
         public async Task<User?> RegisterUser(CustomerRegisterDto newUserDto)
         {
             var checkUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == newUserDto.Email);
@@ -40,6 +45,13 @@ namespace BookStore.Repository
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
 
+            return user;
+        }
+
+        public async Task<User> RegisterUser(User user)
+        {
+            await _context.Users.AddAsync(user);
+            await _context.SaveChangesAsync();
             return user;
         }
     }
