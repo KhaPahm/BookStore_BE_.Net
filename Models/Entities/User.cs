@@ -19,7 +19,7 @@ namespace BookStore.Models
         [EmailAddress]
         public string Email { get; set; }  
         public string? PasswordHash { get; set; }  // Null if using external login
-        public string? ProfilePictureUrl { get; set; } // Store Google/GitHub profile image
+        public string? ProfilePictureUrl { get; set; } = "https://res.cloudinary.com/dpsux2vzu/image/upload/v1742357469/bookstore/defaultImage/kkiwzpnmgw3xxfvjgurd.jpg";
         public string? AuthProvider { get; set; }  // e.g., "Google", "GitHub"
         public string? ProviderId { get; set; }  // Unique ID from Google/GitHub
         public string Role { get; set; } //"Admin", "Staff", "Customer"
