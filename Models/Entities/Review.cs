@@ -13,6 +13,7 @@ namespace BookStore.Models
         public string Content { get; set; }
         [Range(1, 5)]
         public double Rating { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
         public Guid UserId { get; set; }
         public Guid BookId { get; set; }
         public User User { get; set; }
