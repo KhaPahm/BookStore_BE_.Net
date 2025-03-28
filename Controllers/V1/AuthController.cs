@@ -10,6 +10,7 @@ using BookStore.Models;
 using BookStore.Models.ResponeApi;
 using BookStore.Static;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Mvc;
 
@@ -85,7 +86,8 @@ namespace BookStore.Controllers.V1
 
         [HttpGet("google-response")]
         public async Task<IActionResult> GoogleResponse() {
-            var authenticateResult = await HttpContext.AuthenticateAsync();
+            var authenticateResult = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
 
             if(!authenticateResult.Succeeded) {
                 return Unauthorized();
@@ -105,6 +107,7 @@ namespace BookStore.Controllers.V1
                     Email = claims.First(c => c.Type.ToString() == ClaimTypes.Email).Value,
                     AuthProvider = AuthProvider.Google,
                     Role = UserRole.Customer,
+                    ProviderId = claimId.Value
                 };
 
                 await _authRepo.RegisterUser(user);
