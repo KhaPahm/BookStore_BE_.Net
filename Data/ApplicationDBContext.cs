@@ -10,7 +10,7 @@ public class ApplicationDBContext : DbContext
     public ApplicationDBContext(DbContextOptions dbContextOptions)
     : base(dbContextOptions)
     {
-        
+
     }
 
     public DbSet<Category> Categories { get; set; }
@@ -37,7 +37,7 @@ public class ApplicationDBContext : DbContext
         //     b.HasOne<User>().WithMany(x => x.ShoppingCarts).HasForeignKey(x => x.UserId).IsRequired();
         // });
         #region "ShoppingCart Entiry"
-        modelBuilder.Entity<ShoppingCart>(x => x.HasKey(p => new {p.UserId, p.BookId}));
+        modelBuilder.Entity<ShoppingCart>(x => x.HasKey(p => new { p.UserId, p.BookId }));
         modelBuilder.Entity<ShoppingCart>()
                     .HasOne(u => u.User)
                     .WithMany()
@@ -52,17 +52,17 @@ public class ApplicationDBContext : DbContext
         #region "Review Entiry"
         modelBuilder.Entity<Review>()
                     .HasOne(b => b.Book)
-                    .WithMany(b => b.Reviews)
+                    .WithMany()
                     .HasForeignKey(r => r.BookId);
 
         modelBuilder.Entity<Review>()
                     .HasOne(u => u.User)
-                    .WithMany(u => u.Reviews)
+                    .WithMany()
                     .HasForeignKey(r => r.UserId);
         #endregion
 
         #region "OrderDetail Entity"
-        modelBuilder.Entity<OrderDetail>(o => o.HasKey(k => new {k.BookId, k.OrderId}));
+        modelBuilder.Entity<OrderDetail>(o => o.HasKey(k => new { k.BookId, k.OrderId }));
         modelBuilder.Entity<OrderDetail>()
                     .HasOne(b => b.Book)
                     .WithMany(b => b.OrderDetails)
@@ -88,7 +88,7 @@ public class ApplicationDBContext : DbContext
         #endregion
 
         #region  "Review Like Entity"
-        modelBuilder.Entity<ReviewLike>(x => x.HasKey(rv => new {rv.ReviewId, rv.UserId} ));
+        modelBuilder.Entity<ReviewLike>(x => x.HasKey(rv => new { rv.ReviewId, rv.UserId }));
         modelBuilder.Entity<ReviewLike>()
                     .HasOne(rv => rv.Review)
                     .WithMany(rv => rv.ReviewLikes)
