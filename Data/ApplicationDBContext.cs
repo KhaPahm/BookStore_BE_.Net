@@ -40,12 +40,12 @@ public class ApplicationDBContext : DbContext
         modelBuilder.Entity<ShoppingCart>(x => x.HasKey(p => new {p.UserId, p.BookId}));
         modelBuilder.Entity<ShoppingCart>()
                     .HasOne(u => u.User)
-                    .WithMany(u => u.ShoppingCarts)
+                    .WithMany()
                     .HasForeignKey(s => s.UserId);
 
         modelBuilder.Entity<ShoppingCart>()
                     .HasOne(b => b.Book)
-                    .WithMany(b => b.ShoppingCarts)
+                    .WithMany()
                     .HasForeignKey(s => s.BookId);
         #endregion
 
