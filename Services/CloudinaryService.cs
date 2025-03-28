@@ -25,7 +25,7 @@ namespace BookStore.Services
             _cloundinary = new Cloudinary(account);
         }
 
-        public async Task<string?> UploadImageAsync(IFormFile file)
+        public async Task<string?> UploadImageAsync(IFormFile file, string folderName = "books")
         {
             if (file.Length > 0)
             {
@@ -33,7 +33,7 @@ namespace BookStore.Services
                 var uploadParams = new ImageUploadParams
                 {
                     File = new FileDescription(file.FileName, stream),
-                    Folder = "bookstore/books" // Organize images in Cloudinary
+                    Folder = $"bookstore/{folderName}" // Organize images in Cloudinary
                 };
                 var uploadResult = await _cloundinary.UploadAsync(uploadParams);
                 return uploadResult.SecureUrl.ToString(); // Return image URL
