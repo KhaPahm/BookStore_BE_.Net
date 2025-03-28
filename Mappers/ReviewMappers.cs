@@ -15,7 +15,17 @@ namespace BookStore.Mappers
                 Content = review.Content,
                 Rating = review.Rating,
                 User = review.User.ToUserReviewDto(),
-                Images = review.Images.Select(i => i.ToReviewImageDto()).ToList()
+                Images = review.Images.Select(i => i.ToReviewImageDto()).ToList(),
+                LikeNumber = review.LikeNumber
+            };
+        }
+
+        public static Review ToReviewModel(this CreateReviewDto createReviewDto, Guid userId) {
+            return new Review {
+                Content = createReviewDto.Content,
+                Rating = createReviewDto.Rating,
+                BookId = createReviewDto.BookId,
+                UserId = userId,
             };
         }
     }
