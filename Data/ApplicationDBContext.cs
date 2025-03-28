@@ -65,11 +65,11 @@ public class ApplicationDBContext : DbContext
         modelBuilder.Entity<OrderDetail>(o => o.HasKey(k => new { k.BookId, k.OrderId }));
         modelBuilder.Entity<OrderDetail>()
                     .HasOne(b => b.Book)
-                    .WithMany(b => b.OrderDetails)
+                    .WithMany()
                     .HasForeignKey(o => o.BookId);
         modelBuilder.Entity<OrderDetail>()
                     .HasOne(o => o.Order)
-                    .WithMany(o => o.OrderDetails)
+                    .WithMany()
                     .HasForeignKey(od => od.OrderId);
         #endregion     
 

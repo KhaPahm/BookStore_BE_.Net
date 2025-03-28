@@ -35,9 +35,14 @@ namespace BookStore.Controllers.V1
             var userId = User.GetUserId();
             var orders = await _orderRepo.GetAsync(userId);
 
-            var orderDtos = orders.Select(o => o.ToOrderDto()).ToList();
-            
-            return Ok(orderDtos);
+            var lsOrderDto = new List<OrderDto>();
+
+            foreach(var order in orders) {
+                var orderDetail = await _orderDetailRepo.GetByOrderIdAsync(order.Id);
+                lsOrderDto.Add(order.ToOrderDto(orderDetail));
+            }
+
+            return Ok(new ApiResponse<List<OrderDto>>(200, lsOrderDto));
         }
 
         [HttpGet("{id}")]
@@ -50,142 +55,120 @@ namespace BookStore.Controllers.V1
 
             if(order == null)
                 return NotFound();
+
+            var orderDetails = await _orderDetailRepo.GetByOrderIdAsync(order.Id);
             
-            return Ok(order.ToOrderDto());
+            return Ok(new ApiResponse<OrderDto>(200, order.ToOrderDto(orderDetails)));
         }
         
-
-        // [HttpPost]
-        // public async Task<IActionResult> Create([FromBody] CreateOrderDto orderDto) {
-        //     if(ModelState.IsValid == false)
-        //         return BadRequest(ModelState);
+        // [HttpPost("now")]
+        // public async Task<IActionResult> CreateNow([FromBody] CreateOrderNowDto orderDto) {
+        //     if(!ModelState.IsValid)
+        //         return BadRequest(new ApiResponse<string>(400, null, "Request data is wrong structure.", false));
 
         //     var userId = User.GetUserId();
-        //     var order = orderDto.ToOderFromDto(userId);
-
+        //     var order = orderDto.ToOrderFromDto(userId);
+        //     order.Status = order.Status.ToUpper();
+        //     order.PaymentMethod = order.PaymentMethod.ToUpper();
         //     await _orderRepo.CreateAysnc(order);
 
-        //     var orderDetails = orderDto.OrderDetailDtos
-        //         .Select(od => od.ToOderDetailFromDto(order.Id))
-        //         .ToList();
+        //     var orderDetailDto = orderDto.OrderDetail;
+        //     var orderDetail = orderDetailDto.ToOderDetailFromDto(order.Id);
+        //     await _orderDetailRepo.CreateAsync(orderDetail);
 
-        //     await _orderDetailRepo.CreateAsync(orderDetails);
-            
-        //     var totalPrice = orderDetails.Sum(od => od.PriceAtPurchase);
-
+        //     var totalPrice = orderDetail.Quantity * orderDetail.PriceAtPurchase;
         //     await _orderRepo.UpdateTotalPriceAsync(order.Id, totalPrice);
 
         //     var newOrder = await _orderRepo.GetByIdAsync(userId, order.Id);
 
+
+        //     return CreatedAtAction(nameof(GetById), new {id = newOrder.Id}, new ApiResponse<OrderDto>(201, newOrder.ToOrderDto(new List<OrderDetail>() {orderDetail})));
+        // }
+
+        // [HttpPost]
+        // public async Task<IActionResult> CreateFromShippingCart([FromBody]CreateOrderDto createOrder) {
+        //     if(!ModelState.IsValid)
+        //         return BadRequest(new ApiResponse<string>(400, null, "Request data is wrong structure.", false));
+            
+        //     var userId = User.GetUserId();
+
+        //     var shoppingCarts = await _shoppingCart.GetAllByUserIdAsync(userId);
+        //     if(shoppingCarts.Count == 0)
+        //         return BadRequest(new ApiResponse<string>(400, null, "Your shopping cart is null.", false));
+
+        //     var order = createOrder.ToOderFromDto(userId);
+        //     order.Status = order.Status.ToUpper();
+        //     order.PaymentMethod = order.PaymentMethod.ToUpper();
+        //     await _orderRepo.CreateAysnc(order);
+
+        //     var orderDetails = shoppingCarts.Select(sc => sc.ToOrderDetailFromShoppingCart(order.Id)).ToList();
+        //     await _orderDetailRepo.CreateAsync(orderDetails);
+        //     await _shoppingCart.ClearAsync(userId);
+
+        //     var totalPrice = orderDetails.Sum(od => od.PriceAtPurchase*od.Quantity);
+
+        //     await _orderRepo.UpdateTotalPriceAsync(order.Id, totalPrice);
+
+        //     var newOrder = await _orderRepo.GetByIdAsync(userId, order.Id);
         //     return CreatedAtAction(nameof(GetById), new {id = newOrder.Id}, newOrder.ToOrderDto());
         // }
 
-        [HttpPost("now")]
-        public async Task<IActionResult> CreateNow([FromBody] CreateOrderNowDto orderDto) {
-            if(!ModelState.IsValid)
-                return BadRequest(new ApiResponse<string>(400, null, "Request data is wrong structure.", false));
-
-            var userId = User.GetUserId();
-            var order = orderDto.ToOrderFromDto(userId);
-            order.Status = order.Status.ToUpper();
-            order.PaymentMethod = order.PaymentMethod.ToUpper();
-            await _orderRepo.CreateAysnc(order);
-
-            var orderDetailDto = orderDto.OrderDetail;
-            var orderDetail = orderDetailDto.ToOderDetailFromDto(order.Id);
-            await _orderDetailRepo.CreateAsync(orderDetail);
-
-            var totalPrice = orderDetail.Quantity * orderDetail.PriceAtPurchase;
-            await _orderRepo.UpdateTotalPriceAsync(order.Id, totalPrice);
-
-            var newOrder = await _orderRepo.GetByIdAsync(userId, order.Id);
-            return CreatedAtAction(nameof(GetById), new {id = newOrder.Id}, new ApiResponse<OrderDto>(201, newOrder.ToOrderDto()));
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> CreateFromShippingCart([FromBody]CreateOrderDto createOrder) {
-            if(!ModelState.IsValid)
-                return BadRequest(new ApiResponse<string>(400, null, "Request data is wrong structure.", false));
+        // [HttpPatch("{orderId}")]
+        // public async Task<IActionResult> UpdateAddress([FromRoute] Guid orderId, [FromBody] UpdateOrderAddressDto updateOrderAddressDto) {
+        //     if(!ModelState.IsValid)
+        //         return BadRequest(new ApiResponse<string>(400, null, "Request data is wrong structure.", false));
             
-            var userId = User.GetUserId();
+        //     var userId = User.GetUserId();
 
-            var shoppingCarts = await _shoppingCart.GetAllByUserIdAsync(userId);
-            if(shoppingCarts.Count == 0)
-                return BadRequest(new ApiResponse<string>(400, null, "Your shopping cart is null.", false));
+        //     var order = await _orderRepo.GetByIdAsync(userId, orderId);
+        //     if(order == null)
+        //         return NotFound(new ApiResponse<string>(404, null, "Couldn't find the order.", false));
 
-            var order = createOrder.ToOderFromDto(userId);
-            order.Status = order.Status.ToUpper();
-            order.PaymentMethod = order.PaymentMethod.ToUpper();
-            await _orderRepo.CreateAysnc(order);
+        //     if(order.Status.ToUpper() != "PREPARE") {
+        //         return BadRequest(new ApiResponse<string>(400, null, "Your order was shipped so you couldn't update your address.", false));
+        //     }
 
-            var orderDetails = shoppingCarts.Select(sc => sc.ToOrderDetailFromShoppingCart(order.Id)).ToList();
-            await _orderDetailRepo.CreateAsync(orderDetails);
-            await _shoppingCart.ClearAsync(userId);
+        //     var newOrder = await _orderRepo.UpdateShippingAddress(order.Id, updateOrderAddressDto.ShippingAddress);
 
-            var totalPrice = orderDetails.Sum(od => od.PriceAtPurchase*od.Quantity);
-
-            await _orderRepo.UpdateTotalPriceAsync(order.Id, totalPrice);
-
-            var newOrder = await _orderRepo.GetByIdAsync(userId, order.Id);
-            return CreatedAtAction(nameof(GetById), new {id = newOrder.Id}, newOrder.ToOrderDto());
-        }
-
-        [HttpPatch("{orderId}")]
-        public async Task<IActionResult> UpdateAddress([FromRoute] Guid orderId, [FromBody] UpdateOrderAddressDto updateOrderAddressDto) {
-            if(!ModelState.IsValid)
-                return BadRequest(new ApiResponse<string>(400, null, "Request data is wrong structure.", false));
-            
-            var userId = User.GetUserId();
-
-            var order = await _orderRepo.GetByIdAsync(userId, orderId);
-            if(order == null)
-                return NotFound(new ApiResponse<string>(404, null, "Couldn't find the order.", false));
-
-            if(order.Status.ToUpper() != "PREPARE") {
-                return BadRequest(new ApiResponse<string>(400, null, "Your order was shipped so you couldn't update your address.", false));
-            }
-
-            var newOrder = await _orderRepo.UpdateShippingAddress(order.Id, updateOrderAddressDto.ShippingAddress);
-
-            return Ok(new ApiResponse<OrderDto>(200, newOrder.ToOrderDto()));
-        }
+        //     return Ok(new ApiResponse<OrderDto>(200, newOrder.ToOrderDto()));
+        // }
     
-        [HttpPatch("cancel/{orderId}")]
-        [Authorize(Roles = "CUSTOMER")]
-        public async Task<IActionResult> UpdateState([FromRoute] Guid orderId, [FromBody] UpdateOrderStatusDto updateOrderStatusDto) {
-            var userId = User.GetUserId();
+        // [HttpPatch("cancel/{orderId}")]
+        // [Authorize(Roles = "CUSTOMER")]
+        // public async Task<IActionResult> UpdateState([FromRoute] Guid orderId, [FromBody] UpdateOrderStatusDto updateOrderStatusDto) {
+        //     var userId = User.GetUserId();
 
-            var order = await _orderRepo.GetByIdAsync(userId, orderId);
-            if(order == null)
-                return NotFound(new ApiResponse<string>(404, null, "Couldn't find the order.", false));
+        //     var order = await _orderRepo.GetByIdAsync(userId, orderId);
+        //     if(order == null)
+        //         return NotFound(new ApiResponse<string>(404, null, "Couldn't find the order.", false));
             
-            if(order.Status.ToUpper() != "PREPARE" && order.Status.ToUpper() != "CREATED") {
-                return BadRequest(new ApiResponse<string>(400, null, "Your order was already sent so you couldn't cancel it.", false));
-            }
+        //     if(order.Status.ToUpper() != "PREPARE" && order.Status.ToUpper() != "CREATED") {
+        //         return BadRequest(new ApiResponse<string>(400, null, "Your order was already sent so you couldn't cancel it.", false));
+        //     }
 
-            var orderUpdated = await _orderRepo.UserCancelOrderAsync(orderId, updateOrderStatusDto.CancelReason);
+        //     var orderUpdated = await _orderRepo.UserCancelOrderAsync(orderId, updateOrderStatusDto.CancelReason);
 
-            return Ok(new ApiResponse<OrderDto>(200, orderUpdated.ToOrderDto()));
-        }
+        //     return Ok(new ApiResponse<OrderDto>(200, orderUpdated.ToOrderDto()));
+        // }
 
-        [HttpPatch("update-status/{orderId}")]
-        [Authorize(Roles = "ADMIN, STAFF")]
-        public async Task<IActionResult> UpdateStatus([FromRoute] Guid orderId, [FromBody] StaffUpdateOrderStatusDto updateOrderStatusDto) {
-            if(!ModelState.IsValid)
-                return BadRequest(new ApiResponse<string>(400, null, "Request data is wrong structure.", false));
+        // [HttpPatch("update-status/{orderId}")]
+        // [Authorize(Roles = "ADMIN, STAFF")]
+        // public async Task<IActionResult> UpdateStatus([FromRoute] Guid orderId, [FromBody] StaffUpdateOrderStatusDto updateOrderStatusDto) {
+        //     if(!ModelState.IsValid)
+        //         return BadRequest(new ApiResponse<string>(400, null, "Request data is wrong structure.", false));
             
-            string[] statusList = {"CREATED", "PREPARING", "SHIPPING", "COMPLETED", "CANCELING", "CANCELED"};
-            if(!statusList.Contains(updateOrderStatusDto.Status)) 
-                return BadRequest(new ApiResponse<string>(400, null, "Status have to in list [\"CREATED\", \"PREPARING\", \"SHIPPING\", \"COMPLETED\", \"CANCELING\", \"CANCELED\"]", false));
+        //     string[] statusList = {"CREATED", "PREPARING", "SHIPPING", "COMPLETED", "CANCELING", "CANCELED"};
+        //     if(!statusList.Contains(updateOrderStatusDto.Status)) 
+        //         return BadRequest(new ApiResponse<string>(400, null, "Status have to in list [\"CREATED\", \"PREPARING\", \"SHIPPING\", \"COMPLETED\", \"CANCELING\", \"CANCELED\"]", false));
 
-            var userId = User.GetUserId();
-            var order = await _orderRepo.GetByIdAsync(orderId);
-            if(order == null)
-                return NotFound(new ApiResponse<string>(404, null, "Couldn't find the order.", false));
+        //     var userId = User.GetUserId();
+        //     var order = await _orderRepo.GetByIdAsync(orderId);
+        //     if(order == null)
+        //         return NotFound(new ApiResponse<string>(404, null, "Couldn't find the order.", false));
 
-            var orderUpdated = await _orderRepo.UpdateOrderStatusAsycn(order.Id, updateOrderStatusDto);
+        //     var orderUpdated = await _orderRepo.UpdateOrderStatusAsycn(order.Id, updateOrderStatusDto);
 
-            return Ok(new ApiResponse<OrderDto>(200, orderUpdated.ToOrderDto())); 
-        }
+        //     return Ok(new ApiResponse<OrderDto>(200, orderUpdated.ToOrderDto())); 
+        // }
     }
 }

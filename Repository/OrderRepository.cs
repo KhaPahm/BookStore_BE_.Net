@@ -40,15 +40,6 @@ namespace BookStore.Repository
         public async Task<List<Order>> GetAsync(Guid userId)
         {
             var orders = await _context.Orders
-                                .Include(o => o.OrderDetails)
-                                    .ThenInclude(od => od.Book)
-                                        .ThenInclude(od => od.Category)
-                                .Include(o => o.OrderDetails)
-                                    .ThenInclude(od => od.Book)
-                                        .ThenInclude(od => od.Publisher)
-                                .Include(o => o.OrderDetails)
-                                    .ThenInclude(od => od.Book)
-                                        .ThenInclude(od => od.Images)
                                 .Where(o => o.UserId == userId).ToListAsync();
             return orders;
         }
@@ -56,15 +47,6 @@ namespace BookStore.Repository
         public Order GetById(Guid userId, Guid orderId)
         {
             var order = _context.Orders
-                                .Include(o => o.OrderDetails)
-                                    .ThenInclude(od => od.Book)
-                                        .ThenInclude(od => od.Category)
-                                .Include(o => o.OrderDetails)
-                                    .ThenInclude(od => od.Book)
-                                        .ThenInclude(od => od.Publisher)
-                                .Include(o => o.OrderDetails)
-                                    .ThenInclude(od => od.Book)
-                                        .ThenInclude(od => od.Images)
                                 .FirstOrDefault(o => o.UserId == userId && o.Id == orderId);
 
             return order;
@@ -73,23 +55,8 @@ namespace BookStore.Repository
         public async Task<Order?> GetByIdAsync(Guid userId, Guid orderId)
         {
             var order = await _context.Orders
-                                .Include(o => o.OrderDetails)
-                                    .ThenInclude(od => od.Book)
-                                        .ThenInclude(od => od.Category)
-                                .Include(o => o.OrderDetails)
-                                    .ThenInclude(od => od.Book)
-                                        .ThenInclude(od => od.Publisher)
-                                .Include(o => o.OrderDetails)
-                                    .ThenInclude(od => od.Book)
-                                        .ThenInclude(od => od.Images)
                                 .FirstOrDefaultAsync(o => o.UserId == userId && o.Id == orderId)
                                 .ConfigureAwait(true);
-
-            // var order = await _context.Orders
-            //             .Where(o => o.UserId == userId && o.Id == orderId)
-            //             .Select(o => o)
-            //             .FirstOrDefaultAsync();
-                        
             return order;
         }
 

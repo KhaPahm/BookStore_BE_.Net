@@ -19,7 +19,7 @@ namespace BookStore.Mappers
             };
         }
 
-        public static OrderDto ToOrderDto(this Order order) {
+        public static OrderDto ToOrderDto(this Order order, List<OrderDetail> orderDetails) {
             return new OrderDto {
                 Id = order.Id,
                 TotalPrice = order.TotalPrice,
@@ -30,7 +30,7 @@ namespace BookStore.Mappers
                 PaymentMethod = order.PaymentMethod,
                 PayPalTransactionId = order.PayPalTransactionId,
                 ShippingAddress = order.ShippingAddress,
-                OrderDetails = order.OrderDetails.Select(od => od.ToOrderDetailDto()).ToList()
+                OrderDetails = orderDetails.Select(od => od.ToOrderDetailDto()).ToList()
             };
         }
 

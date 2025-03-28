@@ -42,5 +42,18 @@ namespace BookStore.Repository
             await _context.SaveChangesAsync();
             return orderDetail;
         }
+
+        public async Task<List<OrderDetail>> GetByOrderIdAsync(Guid orderId)
+        {
+            var orderDetails = await _context.OrderDetails
+                            .Include(od => od.Book)
+                                .ThenInclude(b => b.Category)
+                            .Include(od => od.Book)
+                                .ThenInclude(b => b.Publisher)
+                            .Include(od => od.Book)
+                                .ThenInclude(b => b.Images)
+                            .Where(od => od.OrderId == orderId).ToListAsync();
+            return orderDetails;
+        }
     }
 }
