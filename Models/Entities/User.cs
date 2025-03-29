@@ -24,8 +24,5 @@ namespace BookStore.Models
         public string? ProviderId { get; set; }  // Unique ID from Google/GitHub
         public string Role { get; set; } //"Admin", "Staff", "Customer"
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public List<Order> Orders { get; set; }
-        public List<ReviewReply> ReviewReplies { get; set; } = new();
-        public List<ReviewLike> ReviewLikes { get; set; } = new();
     }
 }

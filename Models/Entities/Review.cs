@@ -20,7 +20,5 @@ namespace BookStore.Models
         public User User { get; set; }
         public Book Book { get; set; }
         public ICollection<ReviewImage> Images { get; set; }
-        public ICollection<ReviewReply> ReviewReplies { get; set; }
-        public ICollection<ReviewLike> ReviewLikes { get; set; }
     }
 }

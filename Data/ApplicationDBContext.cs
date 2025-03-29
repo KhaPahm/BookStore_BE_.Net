@@ -76,13 +76,13 @@ public class ApplicationDBContext : DbContext
         #region  "Review Reply Entity"
         modelBuilder.Entity<ReviewReply>()
                     .HasOne(rv => rv.Review)
-                    .WithMany(rv => rv.ReviewReplies)
+                    .WithMany()
                     .HasForeignKey(r => r.ReviewId)
                     .OnDelete(DeleteBehavior.NoAction);
 
         modelBuilder.Entity<ReviewReply>()
                     .HasOne(rv => rv.User)
-                    .WithMany(u => u.ReviewReplies)
+                    .WithMany()
                     .HasForeignKey(rv => rv.UserId)
                     .OnDelete(DeleteBehavior.NoAction);
         #endregion
@@ -91,13 +91,13 @@ public class ApplicationDBContext : DbContext
         modelBuilder.Entity<ReviewLike>(x => x.HasKey(rv => new { rv.ReviewId, rv.UserId }));
         modelBuilder.Entity<ReviewLike>()
                     .HasOne(rv => rv.Review)
-                    .WithMany(rv => rv.ReviewLikes)
+                    .WithMany()
                     .HasForeignKey(r => r.ReviewId)
                     .OnDelete(DeleteBehavior.NoAction);
 
         modelBuilder.Entity<ReviewLike>()
                     .HasOne(rv => rv.User)
-                    .WithMany(u => u.ReviewLikes)
+                    .WithMany()
                     .HasForeignKey(rv => rv.UserId)
                     .OnDelete(DeleteBehavior.NoAction);
         #endregion
