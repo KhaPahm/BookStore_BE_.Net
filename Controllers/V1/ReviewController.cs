@@ -22,12 +22,14 @@ namespace BookStore.Controllers.V1
         private readonly IReviewRepository _reviewRepo;
         private readonly IBookRepository _bookRepo;
         private readonly IReviewImageRepository _reviewImageRepo;
+        private readonly IReviewLikeRepository _reviewLikeRepo;
 
-        public ReviewController(IReviewRepository reviewRepo, IBookRepository bookRepo, IReviewImageRepository reviewImageRepo)
+        public ReviewController(IReviewRepository reviewRepo, IBookRepository bookRepo, IReviewImageRepository reviewImageRepo, IReviewLikeRepository reviewLikeRepo)
         {
             _reviewRepo = reviewRepo;
             _bookRepo = bookRepo;
             _reviewImageRepo = reviewImageRepo;
+            _reviewLikeRepo = reviewLikeRepo;
         }
 
         [HttpGet("by-book-id/{bookId}")]
@@ -81,6 +83,25 @@ namespace BookStore.Controllers.V1
             var updatedReview = await _reviewRepo.UpdateAsync(reviewId, updateReviewDto);
 
             return Ok(new ApiResponse<ReviewDto>(200, updatedReview.ToReviewDto()));
+        }
+    
+        [HttpPost("like")]
+        [Authorize]
+        public async Task<IActionResult> LikeReview([FromBody] LikeReviewDto likeReviewDto) {
+            if(!ModelState.IsValid) 
+                return BadRequest(new ApiResponse<string>(400, null, "Request data is wrong structure.", false));
+
+            var review = await _reviewRepo.GetByIdAsync(likeReviewDto.ReviewId);
+            if(review == null) 
+                return NotFound(new ApiResponse<string>(404, null, "Couldn't find the review.", false));
+
+            
+            var userId = User.GetUserId();
+            var checkLiked = await _reviewLikeRepo.CheckLikeReviewAsync(userId, likeReviewDto.ReviewId);
+            if (checkLiked == null)
+                await _reviewLikeRepo.LikeReviewAsync(userId, likeReviewDto.ReviewId);
+
+            return Ok(new ApiResponse<string>(200, null));
         }
     }
 }

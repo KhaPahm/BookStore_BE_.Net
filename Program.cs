@@ -95,6 +95,7 @@ builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IOrderDetailRepository, OderDetailRepository>();
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 builder.Services.AddScoped<IReviewImageRepository, ReviewImageRepository>();
+builder.Services.AddScoped<IReviewLikeRepository, ReviewLikeRepository>();
 
 var app = builder.Build();
 
