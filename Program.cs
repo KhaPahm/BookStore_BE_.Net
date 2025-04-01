@@ -1,7 +1,11 @@
+using System.Net;
 using System.Text;
+using System.Text.Json;
 using BookStore.Data;
 using BookStore.Interfaces;
+using BookStore.Middleware;
 using BookStore.Models;
+using BookStore.Models.ResponeApi;
 using BookStore.Repository;
 using BookStore.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -17,31 +21,78 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
 var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]);
-builder.Services.AddAuthentication(options => {
+builder.Services.AddAuthentication(options =>
+{
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme; // Default for API auth
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 })
-.AddJwtBearer(options => {
+.AddJwtBearer(options =>
+{
     options.RequireHttpsMetadata = false;
     options.SaveToken = true;
-    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters {
+    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+    {
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(key),
-        ValidateIssuer = true, 
+        ValidateIssuer = true,
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidateAudience = true,
         ValidAudience = builder.Configuration["Jwt:Audience"],
         ValidateLifetime = true,
         ClockSkew = TimeSpan.Zero
     };
+    options.Events = new JwtBearerEvents
+    {
+        OnChallenge = async context =>
+        {
+            context.HandleResponse();
+            context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+            context.Response.ContentType = "application/json";
+
+            var res = new ApiResponse<string>(
+                Code: context.Response.StatusCode,
+                Message: "Unauthorized access",
+                Data: null,
+                Success: false
+            );
+
+            var json = JsonSerializer.Serialize(res, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            });
+
+            await context.Response.WriteAsync(json);
+        }, 
+
+        OnForbidden = async context =>
+        {
+            context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+            context.Response.ContentType = "application/json";
+
+            var res = new ApiResponse<string>(
+                Code: context.Response.StatusCode,
+                Message: "Forbidden: You don’t have permission to access this resource",
+                Data: null,
+                Success: false
+            );
+
+            var json = JsonSerializer.Serialize(res, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            });
+
+            await context.Response.WriteAsync(json);
+        }, 
+    };
 })
 .AddCookie()
-.AddGoogle(options => {
+.AddGoogle(options =>
+{
     options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
     options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
     options.CallbackPath = "/signin-google";
-    options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme; 
+    options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 });
 
 builder.Services.AddAuthorization();
@@ -75,7 +126,8 @@ builder.Services.AddSwaggerGen(option =>
     });
 });
 
-builder.Services.AddDbContext<ApplicationDBContext>(options => {
+builder.Services.AddDbContext<ApplicationDBContext>(options =>
+{
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
@@ -105,6 +157,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseAuthentication();
 app.UseAuthorization();
