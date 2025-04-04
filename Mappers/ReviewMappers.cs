@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using BookStore.Dtos.Review;
 using BookStore.Models;
+using BookStore.Models.Entities;
 
 namespace BookStore.Mappers
 {
@@ -26,6 +27,23 @@ namespace BookStore.Mappers
                 Rating = createReviewDto.Rating,
                 BookId = createReviewDto.BookId,
                 UserId = userId,
+            };
+        }
+
+        public static ReviewReply ToReviewReply(this CreateReviewReplyDto createReviewReplyDto, Guid userId) {
+            return new ReviewReply {
+                ReviewId = createReviewReplyDto.ReviewId,
+                UserId = userId,
+                Content = createReviewReplyDto.Content
+            };
+        }
+
+        public static ReviewReplyDto ToReviewReplyDto(this ReviewReply reviewReply) {
+            return new ReviewReplyDto {
+                Id = reviewReply.Id,
+                ReviewId = reviewReply.Id,
+                Content = reviewReply.Content,
+                User = reviewReply.User.ToUserReviewDto()
             };
         }
     }

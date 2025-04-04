@@ -7,6 +7,7 @@ using BookStore.Dtos.Review;
 using BookStore.Extensions;
 using BookStore.Interfaces;
 using BookStore.Mappers;
+using BookStore.Models.Entities;
 using BookStore.Models.ResponeApi;
 using BookStore.Static;
 using Microsoft.AspNetCore.Authorization;
@@ -23,17 +24,20 @@ namespace BookStore.Controllers.V1
         private readonly IBookRepository _bookRepo;
         private readonly IReviewImageRepository _reviewImageRepo;
         private readonly IReviewLikeRepository _reviewLikeRepo;
+        private readonly IReviewReplyRepository _reviewReplyRepo;
 
-        public ReviewController(IReviewRepository reviewRepo, IBookRepository bookRepo, IReviewImageRepository reviewImageRepo, IReviewLikeRepository reviewLikeRepo)
+        public ReviewController(IReviewRepository reviewRepo, IBookRepository bookRepo, IReviewImageRepository reviewImageRepo, IReviewLikeRepository reviewLikeRepo, IReviewReplyRepository reviewReplyRepo)
         {
             _reviewRepo = reviewRepo;
             _bookRepo = bookRepo;
             _reviewImageRepo = reviewImageRepo;
             _reviewLikeRepo = reviewLikeRepo;
+            _reviewReplyRepo = reviewReplyRepo;
         }
 
         [HttpGet("by-book-id/{bookId}")]
-        public async Task<IActionResult> GetByBookId([FromRoute] Guid bookId) {
+        public async Task<IActionResult> GetByBookId([FromRoute] Guid bookId)
+        {
             var reviews = await _reviewRepo.GetByBookIdAsync(bookId);
 
             var reviewsDto = reviews.Select(rv => rv.ToReviewDto()).ToList();
@@ -43,13 +47,14 @@ namespace BookStore.Controllers.V1
 
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> CreateReview([FromForm] CreateReviewDto createReviewDto) {
-            if(!ModelState.IsValid) 
+        public async Task<IActionResult> CreateReview([FromForm] CreateReviewDto createReviewDto)
+        {
+            if (!ModelState.IsValid)
                 return BadRequest(new ApiResponse<string>(400, null, "Request data is wrong structure.", false));
 
             //Check book is exist
             var book = await _bookRepo.GetByIdAsync(createReviewDto.BookId);
-            if(book == null)
+            if (book == null)
                 return NotFound(new ApiResponse<string>(404, null, "Couldn't find the book.", false));
 
             var userId = User.GetUserId();
@@ -67,41 +72,61 @@ namespace BookStore.Controllers.V1
 
         [HttpPut("{reviewId}")]
         [Authorize]
-        public async Task<IActionResult> Update([FromRoute] Guid reviewId, [FromBody] UpdateReviewDto updateReviewDto) {
-            if(!ModelState.IsValid) 
+        public async Task<IActionResult> Update([FromRoute] Guid reviewId, [FromBody] UpdateReviewDto updateReviewDto)
+        {
+            if (!ModelState.IsValid)
                 return BadRequest(new ApiResponse<string>(400, null, "Request data is wrong structure.", false));
 
             var review = await _reviewRepo.GetByIdAsync(reviewId);
-            if(review == null) 
+            if (review == null)
                 return NotFound(new ApiResponse<string>(404, null, "Couldn't find the review.", false));
 
             var userId = User.GetUserId();
 
-            if(review.UserId != userId) 
+            if (review.UserId != userId)
                 return BadRequest(new ApiResponse<string>(400, null, "You couldn't edit other people's review.", false));
 
             var updatedReview = await _reviewRepo.UpdateAsync(reviewId, updateReviewDto);
 
             return Ok(new ApiResponse<ReviewDto>(200, updatedReview.ToReviewDto()));
         }
-    
+
         [HttpPost("like")]
         [Authorize]
-        public async Task<IActionResult> LikeReview([FromBody] LikeReviewDto likeReviewDto) {
-            if(!ModelState.IsValid) 
+        public async Task<IActionResult> LikeReview([FromBody] LikeReviewDto likeReviewDto)
+        {
+            if (!ModelState.IsValid)
                 return BadRequest(new ApiResponse<string>(400, null, "Request data is wrong structure.", false));
 
             var review = await _reviewRepo.GetByIdAsync(likeReviewDto.ReviewId);
-            if(review == null) 
+            if (review == null)
                 return NotFound(new ApiResponse<string>(404, null, "Couldn't find the review.", false));
 
-            
             var userId = User.GetUserId();
             var checkLiked = await _reviewLikeRepo.CheckLikeReviewAsync(userId, likeReviewDto.ReviewId);
             if (checkLiked == null)
                 await _reviewLikeRepo.LikeReviewAsync(userId, likeReviewDto.ReviewId);
 
             return Ok(new ApiResponse<string>(200, null));
+        }
+
+        [HttpPost("reviewReply")]
+        [Authorize]
+        public async Task<IActionResult> ReviewReply([FromBody] CreateReviewReplyDto createReviewReplyDto)
+        {
+            var userId = User.GetUserId();
+            var reviewReply = createReviewReplyDto.ToReviewReply(userId);
+            await _reviewReplyRepo.CreateAsync(reviewReply);
+            return Ok(new ApiResponse<string>(200, null));
+        }
+
+        [HttpGet("reviewReply/{reviewId}")]
+        public async Task<IActionResult> GetReviewReplyByReviewId([FromRoute] Guid reviewId) {
+            var reviewReplies = await _reviewReplyRepo.GetByReviewIdAsync(reviewId);
+
+            var reviewRepliesDto = reviewReplies.Select(rv => rv.ToReviewReplyDto()).ToList();
+
+            return Ok(new ApiResponse<List<ReviewReplyDto>>(200, reviewRepliesDto));
         }
     }
 }
