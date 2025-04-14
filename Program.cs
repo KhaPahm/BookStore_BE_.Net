@@ -7,6 +7,7 @@ using BookStore.Interfaces;
 using BookStore.Middleware;
 using BookStore.Models;
 using BookStore.Models.ResponeApi;
+using BookStore.Options;
 using BookStore.Repository;
 using BookStore.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -135,10 +136,15 @@ builder.Services.AddDbContext<ApplicationDBContext>(options =>
 });
 
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
+builder.Services.Configure<PaypalSettings>(builder.Configuration.GetSection("PaypalSettings"));
 
 // Add services to the container.
+builder.Services.AddHttpClient();
+
 builder.Services.AddSingleton<ICloudinaryService, CloudinaryService>();
 builder.Services.AddSingleton<IJwtService, JwtService>();
+builder.Services.AddScoped<IPaypalService, PaypalService>();
+
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IPublisherRepository, PublisherRepository>();
 builder.Services.AddScoped<IBookRepository, BookRepository>();
@@ -147,7 +153,7 @@ builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IUserAddressRepository, UserAddressRepository>();
 builder.Services.AddScoped<IShoppingCartRepository, ShoppingCartRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
-builder.Services.AddScoped<IOrderDetailRepository, OderDetailRepository>();
+builder.Services.AddScoped<IOrderDetailRepository, OrderDetailRepository>();
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 builder.Services.AddScoped<IReviewImageRepository, ReviewImageRepository>();
 builder.Services.AddScoped<IReviewLikeRepository, ReviewLikeRepository>();

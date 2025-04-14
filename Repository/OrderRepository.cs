@@ -89,5 +89,23 @@ namespace BookStore.Repository
         {
             return await _context.Orders.FirstOrDefaultAsync(o => o.Id == orderId);
         }
+
+        public async Task UpdatePayPalOrderId(Guid orderId, string paypalTransactionId)
+        {
+            var order = await _context.Orders.FirstAsync(o => o.Id == orderId);
+            order.PayPalTransactionId = paypalTransactionId;
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<Order> UpdateOrderStatusByTransactionIdAsycn(string transactionId, string orderStatus)
+        {
+            var order = await _context.Orders.FirstOrDefaultAsync(o => o.PayPalTransactionId == transactionId);
+            if(order == null) 
+                return null;
+
+            order.Status = orderStatus;
+            await _context.SaveChangesAsync();
+            return order;
+        }
     }
 }

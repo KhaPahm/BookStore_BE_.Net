@@ -38,7 +38,6 @@ namespace BookStore.Mappers
             return new Order {
                 UserNote = orderNowDto.UserNote,
                 PaymentMethod = orderNowDto.PaymentMethod,
-                PayPalTransactionId = orderNowDto.PayPalTransactionId,
                 ShippingAddress = orderNowDto.ShippingAddress,
                 UserId = userId
             };

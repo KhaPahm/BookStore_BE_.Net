@@ -10,11 +10,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BookStore.Repository
 {
-    public class OderDetailRepository : IOrderDetailRepository
+    public class OrderDetailRepository : IOrderDetailRepository
     {
         private readonly ApplicationDBContext _context;
 
-        public OderDetailRepository(ApplicationDBContext context)
+        public OrderDetailRepository(ApplicationDBContext context)
         {
             _context = context;
         }

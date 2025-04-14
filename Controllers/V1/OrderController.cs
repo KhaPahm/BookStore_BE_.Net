@@ -8,6 +8,7 @@ using BookStore.Interfaces;
 using BookStore.Mappers;
 using BookStore.Models;
 using BookStore.Models.ResponeApi;
+using BookStore.Static;
 using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,12 +23,14 @@ namespace BookStore.Controllers.V1
         private readonly IOrderRepository _orderRepo;
         private readonly IOrderDetailRepository _orderDetailRepo;
         private readonly IShoppingCartRepository _shoppingCart;
+        private readonly IPaypalService _paypalService;
 
-        public OrderController(IOrderRepository orderRepo, IOrderDetailRepository orderDetailRepo, IShoppingCartRepository shoppingCart)
+        public OrderController(IOrderRepository orderRepo, IOrderDetailRepository orderDetailRepo, IShoppingCartRepository shoppingCart, IPaypalService paypalService)
         {
             _orderRepo = orderRepo;
             _orderDetailRepo = orderDetailRepo;
             _shoppingCart = shoppingCart;
+            _paypalService = paypalService;
         }
 
         [HttpGet]
@@ -60,30 +63,56 @@ namespace BookStore.Controllers.V1
             
             return Ok(new ApiResponse<OrderDto>(200, order.ToOrderDto(orderDetails)));
         }
-        
-        // [HttpPost("now")]
-        // public async Task<IActionResult> CreateNow([FromBody] CreateOrderNowDto orderDto) {
-        //     if(!ModelState.IsValid)
-        //         return BadRequest(new ApiResponse<string>(400, null, "Request data is wrong structure.", false));
 
-        //     var userId = User.GetUserId();
-        //     var order = orderDto.ToOrderFromDto(userId);
-        //     order.Status = order.Status.ToUpper();
-        //     order.PaymentMethod = order.PaymentMethod.ToUpper();
-        //     await _orderRepo.CreateAysnc(order);
+        [HttpPost("payments/excute")]
+        public async Task<IActionResult> ExcutePayment([FromBody]string paymentToken) {
+            var success = await _paypalService.CapturePayment(paymentToken);
 
-        //     var orderDetailDto = orderDto.OrderDetail;
-        //     var orderDetail = orderDetailDto.ToOderDetailFromDto(order.Id);
-        //     await _orderDetailRepo.CreateAsync(orderDetail);
+            if(!success) 
+                return BadRequest(new ApiResponse<string>(400, null, "Payment failed.", false));
 
-        //     var totalPrice = orderDetail.Quantity * orderDetail.PriceAtPurchase;
-        //     await _orderRepo.UpdateTotalPriceAsync(order.Id, totalPrice);
+            //Cập nhật stock => chưa làm
 
-        //     var newOrder = await _orderRepo.GetByIdAsync(userId, order.Id);
+            //Cập nhật trạng thái order
+            var order = await _orderRepo.UpdateOrderStatusByTransactionIdAsycn(paymentToken, OrderStatus.Preparing);
+            if(order == null) {
+                return NotFound(new ApiResponse<string>(404, null, "Couldn't find the order.", false));
+            }
+            
+            return Ok(new ApiResponse<string>(200, null, "Payment successful"));
+        }
+
+        [HttpPost("now")]
+        public async Task<IActionResult> CreateNow([FromBody] CreateOrderNowDto orderDto) {
+            var userId = User.GetUserId();
+            var order = orderDto.ToOrderFromDto(userId);
+            if(orderDto.PaymentMethod.ToUpper() == PaymentMethods.Paypal) {
+                order.Status = OrderStatus.Paying;
+            }
+            order.PaymentMethod = order.PaymentMethod.ToUpper();
+            await _orderRepo.CreateAysnc(order);
+
+            var orderDetailDto = orderDto.OrderDetail;
+            var orderDetail = orderDetailDto.ToOderDetailFromDto(order.Id);
+            await _orderDetailRepo.CreateAsync(orderDetail);
+
+            var totalPrice = orderDetail.Quantity * orderDetail.PriceAtPurchase;
+            await _orderRepo.UpdateTotalPriceAsync(order.Id, totalPrice);
+
+            if(orderDto.PaymentMethod.ToUpper() == PaymentMethods.Paypal) {
+                var approvalUrl = await _paypalService.CreatePayment((decimal)totalPrice, "http://localhost:5075/payment-success", "http://localhost:5075/payment-cancel");
+                var paypalTransactionId = approvalUrl.Split("=");
+                await _orderRepo.UpdatePayPalOrderId(order.Id, paypalTransactionId[1]);
+                return Ok(new ApiResponse<object>(200, new {approvalUrl}, "PayPal payment link created"));
+            }
+            else
+            {
+                var newOrder = await _orderRepo.GetByIdAsync(userId, order.Id);
+                return CreatedAtAction(nameof(GetById), new {id = newOrder.Id}, new ApiResponse<OrderDto>(201, newOrder.ToOrderDto(new List<OrderDetail>() {orderDetail})));
+            }
+        }
 
 
-        //     return CreatedAtAction(nameof(GetById), new {id = newOrder.Id}, new ApiResponse<OrderDto>(201, newOrder.ToOrderDto(new List<OrderDetail>() {orderDetail})));
-        // }
 
         // [HttpPost]
         // public async Task<IActionResult> CreateFromShippingCart([FromBody]CreateOrderDto createOrder) {
