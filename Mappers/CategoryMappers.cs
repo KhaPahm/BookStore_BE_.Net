@@ -9,8 +9,8 @@ namespace BookStore.Mappers
 {
     public static class CategoryMappers
     {
-        public static CaterogyDto ToCategoryDto(this Category categoryModel) {
-            return new CaterogyDto {
+        public static CategoryDto ToCategoryDto(this Category categoryModel) {
+            return new CategoryDto {
                 Id = categoryModel.Id,
                 Name = categoryModel.Name
             };

@@ -16,7 +16,7 @@ namespace BookStore.Dtos.Book
         public int StockQuantity { get; set; }
         public DateTime PublishedDate { get; set; }
         public DateTime CreateAt { get; set; } = DateTime.UtcNow;
-        public CaterogyDto Category {get; set;}
+        public CategoryDto Category {get; set;}
         public PublisherDto Publisher {get;set;}
         public ICollection<BookImageDto> Images { get; set; }
         

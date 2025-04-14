@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace BookStore.Dtos.Category
 {
-    public class CaterogyDto
+    public class CategoryDto
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
