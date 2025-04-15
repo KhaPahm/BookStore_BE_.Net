@@ -72,7 +72,7 @@ builder.Services.AddAuthentication(options =>
 
         OnForbidden = async context =>
         {
-            context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+            context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
             context.Response.ContentType = "application/json";
 
             var res = new ApiResponse<string>(
