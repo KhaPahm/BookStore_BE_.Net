@@ -2,6 +2,7 @@ using System.Net;
 using System.Text;
 using System.Text.Json;
 using BookStore.Data;
+using BookStore.Extensions;
 using BookStore.Filters;
 using BookStore.Interfaces;
 using BookStore.Middleware;
@@ -141,23 +142,8 @@ builder.Services.Configure<PaypalSettings>(builder.Configuration.GetSection("Pay
 // Add services to the container.
 builder.Services.AddHttpClient();
 
-builder.Services.AddSingleton<ICloudinaryService, CloudinaryService>();
-builder.Services.AddSingleton<IJwtService, JwtService>();
-builder.Services.AddScoped<IPaypalService, PaypalService>();
-
-builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
-builder.Services.AddScoped<IPublisherRepository, PublisherRepository>();
-builder.Services.AddScoped<IBookRepository, BookRepository>();
-builder.Services.AddScoped<IBookImageRepository, BookImageRepository>();
-builder.Services.AddScoped<IAuthRepository, AuthRepository>();
-builder.Services.AddScoped<IUserAddressRepository, UserAddressRepository>();
-builder.Services.AddScoped<IShoppingCartRepository, ShoppingCartRepository>();
-builder.Services.AddScoped<IOrderRepository, OrderRepository>();
-builder.Services.AddScoped<IOrderDetailRepository, OrderDetailRepository>();
-builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
-builder.Services.AddScoped<IReviewImageRepository, ReviewImageRepository>();
-builder.Services.AddScoped<IReviewLikeRepository, ReviewLikeRepository>();
-builder.Services.AddScoped<IReviewReplyRepository, ReviewReplyRepository>();
+builder.Services.AddServices();
+builder.Services.AddRepositories();
 
 var app = builder.Build();
 
