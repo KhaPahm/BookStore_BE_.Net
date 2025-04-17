@@ -141,7 +141,6 @@ builder.Services.Configure<PaypalSettings>(builder.Configuration.GetSection("Pay
 
 // Add services to the container.
 builder.Services.AddHttpClient();
-
 builder.Services.AddServices();
 builder.Services.AddRepositories();
 

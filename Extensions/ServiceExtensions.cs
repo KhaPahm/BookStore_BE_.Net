@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BookStore.Interfaces;
+using BookStore.Interfaces.Services;
 using BookStore.Repository;
 using BookStore.Services;
 
@@ -32,6 +33,8 @@ namespace BookStore.Extensions
             services.AddSingleton<ICloudinaryService, CloudinaryService>();
             services.AddSingleton<IJwtService, JwtService>();
             services.AddScoped<IPaypalService, PaypalService>();
+
+            services.AddScoped<IPublisherService, PublisherService>();
         }
     }
 }

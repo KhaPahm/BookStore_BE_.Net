@@ -25,13 +25,8 @@ namespace BookStore.Repository
             return publisher;
         }
 
-        public async Task<Publisher?> DeleteAsync(Guid id)
+        public async Task<Publisher?> DeleteAsync(Publisher publisher)
         {
-            var publisher = await _context.Publishers.FirstOrDefaultAsync(p => p.Id == id);
-
-            if(publisher == null)
-                return null;
-
             _context.Publishers.Remove(publisher);
             await _context.SaveChangesAsync();
             return publisher;
@@ -44,27 +39,13 @@ namespace BookStore.Repository
 
         public async Task<Publisher?> GetByIdAsync(Guid id)
         {
-            var publisher = await _context.Publishers.FirstOrDefaultAsync(p => p.Id == id);
-
-            if(publisher == null)
-                return null;
-            
-            return publisher;
+            return await _context.Publishers.FirstOrDefaultAsync(p => p.Id == id);
         }
 
-        public async Task<Publisher> UpdateAsync(Guid id, UpdatePublisherDto publisherDto)
+        public async Task<Publisher> UpdateAsync(Publisher publisher)
         {
-            var publisher = await _context.Publishers.FirstOrDefaultAsync(p => p.Id == id);
-
-            if(publisher == null)
-                return null;
-
-            publisher.Name = publisherDto.Name;
-            publisher.Address = publisherDto.Address;
-            publisher.PhoneNumber = publisherDto.PhoneNumber;
-
+            _context.Publishers.Update(publisher);
             await _context.SaveChangesAsync();
-
             return publisher;
         }
     }

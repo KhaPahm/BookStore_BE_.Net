@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using BookStore.Data;
 using BookStore.Dtos.Publisher;
 using BookStore.Interfaces;
+using BookStore.Interfaces.Services;
 using BookStore.Mappers;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,55 +15,43 @@ namespace BookStore.Controllers.V1
     [ApiController]
     public class PublisherController : ControllerBase
     {
-        private readonly IPublisherRepository _publisherRepo;
+        private readonly IPublisherService _publisherService;
 
-        public PublisherController(IPublisherRepository publisherRepo)
+        public PublisherController(IPublisherService publisherService)
         {
-            _publisherRepo = publisherRepo;
+            _publisherService = publisherService;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAll() {
-            var publishers = await _publisherRepo.GetAllAsync();
-            var publishersDto = publishers.Select(p => p.ToPublisherDto());
+            var publishersDto = await _publisherService.GetAllPublisherDtoAsync();
             return Ok(publishersDto);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById([FromRoute] Guid id) {
-            var publisher = await _publisherRepo.GetByIdAsync(id);
-
-            if(publisher == null)
-                return NotFound();
-
-            return Ok(publisher.ToPublisherDto());
+            var publisherDto = await _publisherService.GetPublisherDtoByIdAsync(id);
+            return Ok(publisherDto);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreatePublisherDto publisherDto) {
-            var publisherModel = publisherDto.ToPublisherFromCreateDto();
-            var publisher = await _publisherRepo.CreateAsync(publisherModel);
+        public async Task<IActionResult> Create([FromBody] CreatePublisherDto createPublisherDto) {
+            var publisherDto = await _publisherService.CreatePublisherAsync(createPublisherDto);
 
-            return CreatedAtAction(nameof(GetById), new {id = publisher.Id}, publisher.ToPublisherDto());
+            return CreatedAtAction(nameof(GetById), new { id = publisherDto.Id }, publisherDto);
         } 
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdatePublisherDto publisherDto) {
-            var publisher = await _publisherRepo.UpdateAsync(id, publisherDto);
+        public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdatePublisherDto updatePublisherDto) {
+            var publisherDto = await _publisherService.UpdatePublisherAsync(id, updatePublisherDto);
 
-            if(publisher == null)
-                return NotFound();
-
-            return Ok(publisher.ToPublisherDto());
+            return Ok(publisherDto);
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete([FromRoute] Guid id) {
-            var publisher = await _publisherRepo.DeleteAsync(id);
-
-            if(publisher == null)
-                return NotFound();
-
+            await _publisherService.DeletePublisherAsync(id);
+            
             return NoContent();
         }
     }

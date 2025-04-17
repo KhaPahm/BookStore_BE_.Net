@@ -12,7 +12,7 @@ namespace BookStore.Interfaces
         public Task<List<Publisher>> GetAllAsync();
         public Task<Publisher> GetByIdAsync(Guid id);
         public Task<Publisher> CreateAsync(Publisher publisher);
-        public Task<Publisher> UpdateAsync(Guid id, UpdatePublisherDto publisherDto);
-        public Task<Publisher> DeleteAsync(Guid id);
+        public Task<Publisher> UpdateAsync(Publisher publisher);
+        public Task<Publisher> DeleteAsync(Publisher publisher);
     }
 }

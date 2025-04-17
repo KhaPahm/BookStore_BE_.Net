@@ -51,9 +51,6 @@ namespace BookStore.Controllers.V1
 
         [HttpPost]
         public async Task<IActionResult> Create([FromForm] CreateBookDto bookDto) {
-            if(!ModelState.IsValid)
-                return BadRequest(new ApiResponse<string>(400, null, "Data respone isn't suitable.", false));
-
             var bookModel = bookDto.ToBookFromCreateBookDto();
             await _bookRepo.CreateAsync(bookModel);
 
