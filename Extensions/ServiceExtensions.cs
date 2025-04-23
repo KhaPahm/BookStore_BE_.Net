@@ -35,6 +35,7 @@ namespace BookStore.Extensions
             services.AddScoped<IPaypalService, PaypalService>();
 
             services.AddScoped<IPublisherService, PublisherService>();
+            services.AddScoped<ICategoryService, CategoryService>();
         }
     }
 }

@@ -130,10 +130,16 @@ builder.Services.AddSwaggerGen(option =>
         }
     });
 });
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? 
+                        builder.Configuration.GetConnectionString("LinuxServerConnection");
 
+Console.WriteLine(connectionString);
 builder.Services.AddDbContext<ApplicationDBContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseSqlServer(connectionString, sqlOptions =>
+    {
+        sqlOptions.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
+    });
 });
 
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));

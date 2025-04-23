@@ -35,18 +35,12 @@ namespace BookStore.Repository
             return category;
         }
 
-        public async Task<Category?> UpdateAsync(Guid id, UpdateCategoryDto category)
+        public async Task<Category> UpdateAsync(Guid id, UpdateCategoryDto category)
         {
-            var exCategory = await _context.Categories.FirstOrDefaultAsync(c => c.Id == id);
-
-            if (exCategory == null) 
-                return null;
-
+            var exCategory = await _context.Categories.FirstAsync(c => c.Id == id);
             exCategory.Name = category.Name;
             exCategory.Description = category.Description;
-
             await _context.SaveChangesAsync();
-
             return exCategory;
         }
 
@@ -60,6 +54,18 @@ namespace BookStore.Repository
             await _context.SaveChangesAsync();
 
             return category;
+        }
+
+        public async Task<bool> IsCategoryNameExistAsync(string name)
+        {
+            var isExist = await _context.Categories.AnyAsync(c => c.Name.Trim().ToUpper() == name.Trim().ToUpper());
+            return isExist;
+        }
+
+        public async Task<bool> IsCategoryExistAsync(Guid id)
+        {
+            var isExist = await _context.Categories.AnyAsync(c => c.Id == id);
+            return isExist;
         }
     }
 }
