@@ -13,5 +13,6 @@ namespace BookStore.Interfaces.Services
         public Task<PublisherDto> CreatePublisherAsync(CreatePublisherDto publisherDto);
         public Task<PublisherDto> UpdatePublisherAsync(Guid id, UpdatePublisherDto publisherDto);
         public Task<bool> DeletePublisherAsync(Guid id);
+        public Task<bool> IsPublisherExist(Guid id);
     }
 }

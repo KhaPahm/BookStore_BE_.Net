@@ -15,5 +15,6 @@ namespace BookStore.Interfaces.Services
         public Task<bool> DeleteCategoryAsync(Guid id);
         public Task<bool> IsCategoryExistAsync(Guid id);
         public Task<bool> IsCategoryNameExistAsync(string name);
+        bool IsCategoryExist(Guid categoryId);
     }
 }

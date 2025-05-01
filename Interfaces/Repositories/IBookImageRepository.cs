@@ -8,6 +8,7 @@ namespace BookStore.Interfaces
 {
     public interface IBookImageRepository
     {
-        public Task<List<BookImage>> CreateAsync(Guid bookId, ICollection<IFormFile> images);
+        public Task<List<BookImage>> CreateAsync(ICollection<BookImage> bookImages);
+        public Task<BookImage> CreateAsync(BookImage bookImage);
     }
 }

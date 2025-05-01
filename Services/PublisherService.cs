@@ -52,6 +52,12 @@ namespace BookStore.Services
             return publisher.ToPublisherDto();
         }
 
+        public async Task<bool> IsPublisherExist(Guid id)
+        {
+            var publisher = await _publisherRepo.GetByIdAsync(id);
+            return publisher != null;
+        }
+
         public async Task<PublisherDto> UpdatePublisherAsync(Guid id, UpdatePublisherDto publisherDto)
         {
             var publisher = await _publisherRepo.GetByIdAsync(id);

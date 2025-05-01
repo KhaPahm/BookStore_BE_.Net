@@ -11,31 +11,29 @@ namespace BookStore.Repository
     public class BookImageRepository : IBookImageRepository
     {
         private readonly ApplicationDBContext _context;
-        private readonly ICloudinaryService _cloudinaryService;
 
         public BookImageRepository(ApplicationDBContext context, ICloudinaryService cloudinaryService)
         {
             _context = context;
-            _cloudinaryService = cloudinaryService;
         }
 
-        public async Task<List<BookImage>> CreateAsync(Guid bookId, ICollection<IFormFile> images)
+        public async Task<List<BookImage>> CreateAsync(ICollection<BookImage> bookImages)
         {
             List<BookImage> lstBookImage = new();
-
-            foreach(var image in images) {
-                var bookImage = new BookImage {
-                    BookId = bookId
-                };
-
-                var url = await _cloudinaryService.UploadImageAsync(image);
-                bookImage.ImageUrl = url;
+            foreach(var bookImage in bookImages) {
                 await _context.BookImages.AddAsync(bookImage);
-                lstBookImage.Add(bookImage);
                 _context.SaveChanges();
+                lstBookImage.Add(bookImage);
             } 
 
             return lstBookImage;
+        }
+
+        public async Task<BookImage> CreateAsync(BookImage bookImage)
+        {
+            await _context.BookImages.AddAsync(bookImage);
+            await _context.SaveChangesAsync();
+            return bookImage;
         }
     }
 }

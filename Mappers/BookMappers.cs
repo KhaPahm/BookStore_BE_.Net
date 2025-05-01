@@ -45,9 +45,9 @@ namespace BookStore.Mappers
                 StockQuantity = book.StockQuantity,
                 PublishedDate = book.PublishedDate,
                 CreateAt = book.CreateAt,
-                Category = book.Category.ToCategoryDto(),
-                Publisher = book.Publisher.ToPublisherDto(),
-                Images = book.Images.Select(image => image.ToBookImageDto()).ToList()
+                Category = book.Category == null ? null : book.Category.ToCategoryDto(),
+                Publisher = book.Publisher == null ? null : book.Publisher.ToPublisherDto(),
+                Images = book.Images == null ? null : book.Images.Select(image => image.ToBookImageDto()).ToList()
             };
         }
     }

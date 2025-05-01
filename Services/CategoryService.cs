@@ -83,5 +83,11 @@ namespace BookStore.Services
         {
             return await _categoryRepository.IsCategoryNameExistAsync(name);
         }
+
+        public async Task<bool> IsCategoryExist(Guid categoryId)
+        {
+            var category = await _categoryRepository.GetByIdAsync(categoryId);
+            return category != null;
+        }
     } 
 }
