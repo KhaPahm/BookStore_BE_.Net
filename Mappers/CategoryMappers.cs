@@ -16,7 +16,7 @@ namespace BookStore.Mappers
             };
         }
 
-        public static Category ToCategoryFromCreateCategoryDto(this CreateCategoryDto createCategoryDto) {
+        public static Category ToCategoryModel(this CreateCategoryDto createCategoryDto) {
             return new Category {
                 Name = createCategoryDto.Name,
                 Description = createCategoryDto.Description
