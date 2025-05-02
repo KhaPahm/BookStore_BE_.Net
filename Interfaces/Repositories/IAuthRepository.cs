@@ -10,7 +10,6 @@ namespace BookStore.Interfaces
     public interface IAuthRepository
     {
         public Task<User> GetUserByEmail(string email);
-        public Task<User> RegisterUser(CustomerRegisterDto newUserDto);
         public Task<User> RegisterUser(User newUserDto);
         public Task<User> GetUserByProviderIdAsync(string providerId, string authProvider);
     }

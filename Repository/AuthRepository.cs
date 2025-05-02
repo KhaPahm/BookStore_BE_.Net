@@ -27,32 +27,12 @@ namespace BookStore.Repository
             return await _context.Users.FirstOrDefaultAsync(u => u.ProviderId == providerId && u.AuthProvider == authProvider);
         }
 
-        public async Task<User?> RegisterUser(CustomerRegisterDto newUserDto)
+        public async Task<User?> RegisterUser(User newUser)
         {
-            var checkUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == newUserDto.Email);
-            
-            if(checkUser != null)
-                return null;
-                
-            var hashedPassword = BCrypt.Net.BCrypt.HashPassword(newUserDto.Password, 10);
-            var user = new User {
-                FullName = newUserDto.FullName,
-                Email = newUserDto.Email,
-                PasswordHash = hashedPassword,
-                Role = "CUSTOMER"
-            };
-
-            await _context.Users.AddAsync(user);
+            await _context.Users.AddAsync(newUser);
             await _context.SaveChangesAsync();
 
-            return user;
-        }
-
-        public async Task<User> RegisterUser(User user)
-        {
-            await _context.Users.AddAsync(user);
-            await _context.SaveChangesAsync();
-            return user;
+            return newUser;
         }
     }
 }

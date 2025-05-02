@@ -46,7 +46,7 @@ namespace BookStore.Services
             if (isExistCategory) 
                 throw new BadRequestException($"Category with name {categoryDto.Name} already exists.");
             
-            var newCategory = await _categoryRepository.CreateAsync(categoryDto.ToCategoryFromCreateCategoryDto());
+            var newCategory = await _categoryRepository.CreateAsync(categoryDto.ToCategoryModel());
             return newCategory.ToCategoryDto();
         }
 
