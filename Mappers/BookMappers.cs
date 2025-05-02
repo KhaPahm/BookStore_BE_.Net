@@ -9,7 +9,7 @@ namespace BookStore.Mappers
 {
     public static class BookMappers
     {
-        public static Book ToBookFromUpdateBookDto(this UpdateBookDto updateBookDto) {
+        public static Book ToBookModel(this UpdateBookDto updateBookDto) {
             return new Book {
                 Title = updateBookDto.Title,
                 Author = updateBookDto.Author,
@@ -22,7 +22,7 @@ namespace BookStore.Mappers
             };
         }
 
-        public static Book ToBookFromCreateBookDto(this CreateBookDto createBookDto) {
+        public static Book ToBookModel(this CreateBookDto createBookDto) {
             return new Book {
                 Title = createBookDto.Title,
                 Author = createBookDto.Author,

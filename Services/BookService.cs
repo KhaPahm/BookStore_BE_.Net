@@ -31,7 +31,7 @@ namespace BookStore.Services
             
             var categoryDto = await _categoryService.GetCategoryDtoByIdAsync(creatBookDto.CategoryId);
             
-            var bookModel = creatBookDto.ToBookFromCreateBookDto();
+            var bookModel = creatBookDto.ToBookModel();
             await _bookRepository.CreateAsync(bookModel);
 
             var lstBookImage = await _bookImageService.CreateBookImagesAsync(bookModel.Id, creatBookDto.Images);
@@ -61,7 +61,7 @@ namespace BookStore.Services
 
         public async Task<BookDto> UpdateBookDtoAsync(Guid id, UpdateBookDto bookDto)
         {
-            var bookModel = bookDto.ToBookFromUpdateBookDto();
+            var bookModel = bookDto.ToBookModel();
             var isPublisherExist = await _publisherService.IsPublisherExist(bookDto.PublisherId);
             if (!isPublisherExist) 
                 throw new NotFoundException($"Publisher is not found.");
