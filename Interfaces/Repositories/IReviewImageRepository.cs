@@ -8,6 +8,6 @@ namespace BookStore.Interfaces
 {
     public interface IReviewImageRepository
     {
-        public Task<List<ReviewImage>> CreateAsync(Guid reviewId, ICollection<IFormFile>? images);
+        public Task<ReviewImage> CreateAsync(ReviewImage reviewImage);
     }
 }
