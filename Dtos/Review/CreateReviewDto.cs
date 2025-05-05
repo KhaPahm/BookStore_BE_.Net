@@ -9,6 +9,8 @@ namespace BookStore.Dtos.Review
     public class CreateReviewDto
     {
         public Guid BookId { get; set; }
+        [Required(ErrorMessage = "Content is required.")]
+        [StringLength(500, ErrorMessage = "Content must be less than 500 characters.")]
         public string Content { get; set; }
         [Range(1, 5)]
         public double Rating { get; set; }
