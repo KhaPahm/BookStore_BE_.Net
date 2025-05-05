@@ -59,6 +59,11 @@ namespace BookStore.Services
             return Task.FromResult(bookDto);
         }
 
+        public async Task<bool> IsBookExistAsync(Guid id)
+        {
+            return await _bookRepository.IsBookExistAsync(id);
+        }
+
         public async Task<BookDto> UpdateBookDtoAsync(Guid id, UpdateBookDto bookDto)
         {
             var bookModel = bookDto.ToBookModel();

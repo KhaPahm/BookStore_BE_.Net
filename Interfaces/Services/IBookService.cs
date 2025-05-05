@@ -13,5 +13,6 @@ namespace BookStore.Interfaces.Services
         public Task<BookDto> GetBookDtoByIdAsync(Guid id);
         public Task<BookDto> CreateBookDtoAsync(CreateBookDto bookDto);
         public Task<BookDto> UpdateBookDtoAsync(Guid id, UpdateBookDto bookDto);
+        public Task<bool> IsBookExistAsync(Guid id);
     }
 }

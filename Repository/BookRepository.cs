@@ -45,6 +45,11 @@ namespace BookStore.Repository
             .FirstOrDefaultAsync(b => b.Id == id);
         }
 
+        public Task<bool> IsBookExistAsync(Guid id)
+        {
+            return _context.Books.AnyAsync(b => b.Id == id);
+        }
+
         public async Task<Book?> UpdateAsync(Guid id, Book book)
         {
             var bookModel = await _context.Books.Include(b => b.Category)
