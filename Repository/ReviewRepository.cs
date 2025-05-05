@@ -44,6 +44,12 @@ namespace BookStore.Repository
                 .FirstOrDefaultAsync(rv => rv.Id == reviewId);
         }
 
+        public async Task<bool> IsExistAsync(Guid reviewId)
+        {
+            return await _context.Reviews
+                .AnyAsync(rv => rv.Id == reviewId);
+        }
+
         public async Task<Review> UpdateAsync(Guid reviewId, UpdateReviewDto updateReviewDto)
         {
             var rv = await _context.Reviews

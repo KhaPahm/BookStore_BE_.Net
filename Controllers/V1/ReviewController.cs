@@ -6,6 +6,7 @@ using BookStore.Dtos.Book;
 using BookStore.Dtos.Review;
 using BookStore.Extensions;
 using BookStore.Interfaces;
+using BookStore.Interfaces.Services;
 using BookStore.Mappers;
 using BookStore.Models.Entities;
 using BookStore.Models.ResponeApi;
@@ -20,28 +21,17 @@ namespace BookStore.Controllers.V1
     [Route("api/v1/review")]
     public class ReviewController : ControllerBase
     {
-        private readonly IReviewRepository _reviewRepo;
-        private readonly IBookRepository _bookRepo;
-        private readonly IReviewImageRepository _reviewImageRepo;
-        private readonly IReviewLikeRepository _reviewLikeRepo;
-        private readonly IReviewReplyRepository _reviewReplyRepo;
+        private readonly IReviewService _reviewService;
 
-        public ReviewController(IReviewRepository reviewRepo, IBookRepository bookRepo, IReviewImageRepository reviewImageRepo, IReviewLikeRepository reviewLikeRepo, IReviewReplyRepository reviewReplyRepo)
+        public ReviewController(IReviewService reviewService)
         {
-            _reviewRepo = reviewRepo;
-            _bookRepo = bookRepo;
-            _reviewImageRepo = reviewImageRepo;
-            _reviewLikeRepo = reviewLikeRepo;
-            _reviewReplyRepo = reviewReplyRepo;
+            _reviewService = reviewService;
         }
 
         [HttpGet("by-book-id/{bookId}")]
         public async Task<IActionResult> GetByBookId([FromRoute] Guid bookId)
         {
-            var reviews = await _reviewRepo.GetByBookIdAsync(bookId);
-
-            var reviewsDto = reviews.Select(rv => rv.ToReviewDto()).ToList();
-
+            var reviewsDto = await _reviewService.GetByBookIdAsync(bookId);
             return Ok(new ApiResponse<List<ReviewDto>>(200, reviewsDto));
         }
 
@@ -49,63 +39,25 @@ namespace BookStore.Controllers.V1
         [Authorize]
         public async Task<IActionResult> CreateReview([FromForm] CreateReviewDto createReviewDto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(new ApiResponse<string>(400, null, "Request data is wrong structure.", false));
-
-            //Check book is exist
-            var book = await _bookRepo.GetByIdAsync(createReviewDto.BookId);
-            if (book == null)
-                return NotFound(new ApiResponse<string>(404, null, "Couldn't find the book.", false));
-
-            var userId = User.GetUserId();
-            //Convert to review model
-            var review = createReviewDto.ToReviewModel(userId);
-
-            //Add to database
-            await _reviewRepo.CreateAsync(review);
-            await _reviewImageRepo.CreateAsync(review.Id, createReviewDto.Images);
-
-            var newReview = await _reviewRepo.GetByIdAsync(review.Id);
-
-            return Ok(new ApiResponse<ReviewDto>(200, newReview.ToReviewDto()));
+            var reviewDto = await _reviewService.CreateReviewAsync(createReviewDto, User.GetUserId());
+            return Ok(new ApiResponse<ReviewDto>(200, reviewDto));
         }
 
         [HttpPut("{reviewId}")]
         [Authorize]
         public async Task<IActionResult> Update([FromRoute] Guid reviewId, [FromBody] UpdateReviewDto updateReviewDto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(new ApiResponse<string>(400, null, "Request data is wrong structure.", false));
-
-            var review = await _reviewRepo.GetByIdAsync(reviewId);
-            if (review == null)
-                return NotFound(new ApiResponse<string>(404, null, "Couldn't find the review.", false));
-
-            var userId = User.GetUserId();
-
-            if (review.UserId != userId)
-                return BadRequest(new ApiResponse<string>(400, null, "You couldn't edit other people's review.", false));
-
-            var updatedReview = await _reviewRepo.UpdateAsync(reviewId, updateReviewDto);
-
-            return Ok(new ApiResponse<ReviewDto>(200, updatedReview.ToReviewDto()));
+          
+            var reviewDto = await _reviewService.UpdateReviewAsync(reviewId, updateReviewDto, User.GetUserId());
+            return Ok(new ApiResponse<ReviewDto>(200, reviewDto));
         }
 
         [HttpPost("like")]
         [Authorize]
         public async Task<IActionResult> LikeReview([FromBody] LikeReviewDto likeReviewDto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(new ApiResponse<string>(400, null, "Request data is wrong structure.", false));
-
-            var review = await _reviewRepo.GetByIdAsync(likeReviewDto.ReviewId);
-            if (review == null)
-                return NotFound(new ApiResponse<string>(404, null, "Couldn't find the review.", false));
-
             var userId = User.GetUserId();
-            var checkLiked = await _reviewLikeRepo.CheckLikeReviewAsync(userId, likeReviewDto.ReviewId);
-            if (checkLiked == null)
-                await _reviewLikeRepo.LikeReviewAsync(userId, likeReviewDto.ReviewId);
+            await _reviewService.LikeReviewAsync(likeReviewDto.ReviewId, userId);
 
             return Ok(new ApiResponse<string>(200, null));
         }
@@ -115,16 +67,14 @@ namespace BookStore.Controllers.V1
         public async Task<IActionResult> ReviewReply([FromBody] CreateReviewReplyDto createReviewReplyDto)
         {
             var userId = User.GetUserId();
-            var reviewReply = createReviewReplyDto.ToReviewReply(userId);
-            await _reviewReplyRepo.CreateAsync(reviewReply);
+            await _reviewService.ReplyReviewAsync(userId, createReviewReplyDto);
             return Ok(new ApiResponse<string>(200, null));
         }
 
         [HttpGet("reviewReply/{reviewId}")]
         public async Task<IActionResult> GetReviewReplyByReviewId([FromRoute] Guid reviewId) {
-            var reviewReplies = await _reviewReplyRepo.GetByReviewIdAsync(reviewId);
 
-            var reviewRepliesDto = reviewReplies.Select(rv => rv.ToReviewReplyDto()).ToList();
+            var reviewRepliesDto = await _reviewService.GetReviewRepliesAsync(reviewId);
 
             return Ok(new ApiResponse<List<ReviewReplyDto>>(200, reviewRepliesDto));
         }
