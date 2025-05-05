@@ -30,7 +30,7 @@ namespace BookStore.Mappers
             };
         }
 
-        public static ReviewReply ToReviewReply(this CreateReviewReplyDto createReviewReplyDto, Guid userId) {
+        public static ReviewReply ToReviewReplyModel(this CreateReviewReplyDto createReviewReplyDto, Guid userId) {
             return new ReviewReply {
                 ReviewId = createReviewReplyDto.ReviewId,
                 UserId = userId,
