@@ -13,5 +13,6 @@ namespace BookStore.Interfaces
         public Task<Review> GetByIdAsync(Guid reviewId);
         public Task<Review> CreateAsync(Review review);
         public Task<Review> UpdateAsync(Guid reviewId, UpdateReviewDto updateReviewDto);
+        public Task<bool> IsExistAsync(Guid reviewId);
     }
 }
