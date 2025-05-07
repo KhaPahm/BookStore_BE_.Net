@@ -18,7 +18,7 @@ namespace BookStore.Mappers
             };
         }
 
-        public static UserAddress ToUserAddressFromCreateDto(this CreateUserAddressDto userAddressDto) {
+        public static UserAddress ToUserAddressModel(this CreateUserAddressDto userAddressDto) {
             return new UserAddress {
                 Address = userAddressDto.Address,
                 Type = userAddressDto.Type,

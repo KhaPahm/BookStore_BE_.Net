@@ -28,13 +28,8 @@ namespace BookStore.Repository
         public async Task<UserAddress> DeleteAsync(Guid userAddressId)
         {
             var userAddress = await _context.UserAddresses.FirstOrDefaultAsync(ud => ud.Id == userAddressId);
-            
-            if(userAddress == null)
-                return null;
-
             _context.UserAddresses.Remove(userAddress);
             await _context.SaveChangesAsync();
-
             return userAddress;
         }
 
@@ -43,12 +38,14 @@ namespace BookStore.Repository
             return await _context.UserAddresses.Where(ud => ud.UserId == userId).ToListAsync();
         }
 
+        public async Task<bool> IsUserAddressExist(Guid userAddressId)
+        {
+            return await _context.UserAddresses.AnyAsync(ud => ud.Id == userAddressId);
+        }
+
         public async Task<UserAddress?> UpdateAsync(Guid userAddressId, UserAddress userAddress)
         {
             var userAddressModel = await _context.UserAddresses.FirstOrDefaultAsync(ud => ud.Id == userAddressId);
-            if(userAddressModel == null)
-                return null;
-
             userAddressModel.Address = userAddress.Address;
             userAddressModel.Type = userAddress.Type;
             userAddressModel.IsDefault = userAddress.IsDefault;

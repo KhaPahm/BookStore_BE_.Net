@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using BookStore.Dtos.UserAddress;
 using BookStore.Extensions;
 using BookStore.Interfaces;
+using BookStore.Interfaces.Services;
 using BookStore.Mappers;
 using BookStore.Models.ResponeApi;
 using Microsoft.AspNetCore.Authorization;
@@ -17,61 +18,41 @@ namespace BookStore.Controllers.V1
     [ApiController]
     public class UserAddressController:ControllerBase
     {
-        private readonly IUserAddressRepository _userAddressRepo;
+        private readonly IUserAddressService _userAddressService;
 
-        public UserAddressController(IUserAddressRepository userAddressRepo)
+        public UserAddressController(IUserAddressService userAddressService)
         {
-            _userAddressRepo = userAddressRepo;
+            _userAddressService = userAddressService;
         }
 
         [HttpGet]
         [Authorize]
         public async Task<IActionResult> GetByUserId() {
             var userId = User.GetUserId();
-            var userAddress = await _userAddressRepo.GetAllByUserIdAsync(userId);
-
-            var userAddressDtoList = userAddress.Select(ud => ud.ToUserAddressDto()).ToList();
+            var userAddressDtoList = await _userAddressService.GetByUserIdAsync(userId);
             return Ok(new ApiResponse<List<UserAddressDto>>(200, userAddressDtoList));
         }
 
         [HttpPost]
         [Authorize]
         public async Task<IActionResult> Create([FromBody] CreateUserAddressDto userAddressDto) {
-            if (!ModelState.IsValid) 
-                return BadRequest(new ApiResponse<string>(201, null, "Resquest data isn't suitable", false));
 
             var userId = User.GetUserId();
-            var userAddress = userAddressDto.ToUserAddressFromCreateDto();
-            userAddress.UserId = userId;
-            var newUserAddress = await _userAddressRepo.CreateAsync(userAddress);
-
-            return Ok(new ApiResponse<UserAddressDto>(201, newUserAddress.ToUserAddressDto()));
+            var newUserAddessDto = await _userAddressService.CreateAsync(userAddressDto, userId);
+            return Ok(new ApiResponse<UserAddressDto>(201, newUserAddessDto));
         }
 
         [HttpPut("{id}")]
         [Authorize]
-        public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] CreateUserAddressDto userAddressDto) {
-            if (!ModelState.IsValid) 
-                return BadRequest(new ApiResponse<string>(201, null, "Resquest data isn't suitable", false));
-
-            var userAddress = userAddressDto.ToUserAddressFromCreateDto();
-
-            var userAddressModel = await _userAddressRepo.UpdateAsync(id, userAddress);
-            if(userAddressModel == null) 
-                return NotFound();
-
-            var udModel = userAddressModel.ToUserAddressDto();
-            return Ok(new ApiResponse<UserAddressDto>(200, udModel));
+        public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] CreateUserAddressDto createUserAddressDto) {
+            var userAddressDto = await _userAddressService.UpdateAsync(id, createUserAddressDto);
+            return Ok(new ApiResponse<UserAddressDto>(200, userAddressDto));
         }
 
         [HttpDelete("{id}")]
         [Authorize]
         public async Task<IActionResult> Delete([FromRoute] Guid id) {
-            var userAddress = await _userAddressRepo.DeleteAsync(id);
-
-            if(userAddress == null) 
-                return NotFound(new ApiResponse<string>(404, null, "Couldn't find address", false));
-
+            await _userAddressService.DeleteAsync(id);
             return Ok(new ApiResponse<string>(204, null));
         }
     }
