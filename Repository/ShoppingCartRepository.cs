@@ -30,11 +30,6 @@ namespace BookStore.Repository
 
         public async Task<ShoppingCart?> CreateAsync(ShoppingCart shoppingCart)
         {
-            var book = await _context.Books.FirstOrDefaultAsync(b => b.Id == shoppingCart.BookId);
-
-            if(book == null) 
-                return null;
-
             var shoppingCartCheck = await _context.ShoppingCarts.FirstOrDefaultAsync(sc => sc.UserId == shoppingCart.UserId && sc.BookId == shoppingCart.BookId);
 
             if(shoppingCartCheck == null) {
@@ -48,17 +43,11 @@ namespace BookStore.Repository
             return shoppingCart;
         }
 
-        public async Task<ShoppingCart> DeleteAsync(Guid userId, Guid bookId)
+        public async Task<ShoppingCart> DeleteAsync(ShoppingCart shoppingCart)
         {
-            var shoppingCartCheck = await _context.ShoppingCarts.FirstOrDefaultAsync(sc => sc.UserId == userId && sc.BookId == bookId);
-
-            if(shoppingCartCheck == null)
-                return null;
-            
-            _context.ShoppingCarts.Remove(shoppingCartCheck);
+            _context.ShoppingCarts.Remove(shoppingCart);
             await _context.SaveChangesAsync();
-
-            return shoppingCartCheck;
+            return shoppingCart;
         }
 
         public async Task<List<ShoppingCart>> GetAllByUserIdAsync(Guid userId)
@@ -73,6 +62,11 @@ namespace BookStore.Repository
                         .Where(sc => sc.UserId == userId).ToListAsync();
         }
 
+        public async Task<ShoppingCart?> GetByIdAsync(Guid userId, Guid bookId)
+        {
+            return await _context.ShoppingCarts.FirstOrDefaultAsync(sc => sc.UserId == userId && sc.BookId == bookId);
+        }
+
         public async Task<ShoppingCart> UpdateAsync(ShoppingCart shoppingCart)
         {
             var shoppingCartCheck = await _context.ShoppingCarts.FirstOrDefaultAsync(sc => sc.UserId == shoppingCart.UserId && sc.BookId == shoppingCart.BookId);
@@ -83,7 +77,6 @@ namespace BookStore.Repository
 
             shoppingCartCheck.Quantity = shoppingCart.Quantity;
             await _context.SaveChangesAsync();
-
             return shoppingCartCheck;
         }
     }

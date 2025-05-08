@@ -41,6 +41,7 @@ namespace BookStore.Extensions
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IReviewImageService, ReviewImageService>();
             services.AddScoped<IReviewService, ReviewService>();
+            services.AddScoped<IShoppingCartService, ShoppingCartService>();
         }
     }
 }

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using BookStore.Dtos.ShoppingCart;
 using BookStore.Extensions;
 using BookStore.Interfaces;
+using BookStore.Interfaces.Services;
 using BookStore.Mappers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,66 +17,40 @@ namespace BookStore.Controllers.V1
     [Authorize]
     public class ShoppingCartController : ControllerBase
     {
-        private readonly IShoppingCartRepository _shoppingCartRepo;
+        private readonly IShoppingCartService _shoppingCartService;
 
-        public ShoppingCartController(IShoppingCartRepository shoppingCartRepo)
+        public ShoppingCartController(IShoppingCartService shoppingCartService) 
         {
-            _shoppingCartRepo = shoppingCartRepo;
+            _shoppingCartService = shoppingCartService;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAllByUserId() {
             var userId = User.GetUserId();
-            var shoppingCarts = await _shoppingCartRepo.GetAllByUserIdAsync(userId);
-            var shoppingCartDtos = shoppingCarts.Select(sc => sc.ToShoppingCartDto()).ToList();
+            var shoppingCartDtos = await _shoppingCartService.GetAllByUserIdAsync(userId);
             return Ok(shoppingCartDtos);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add([FromBody] AddShoppingCartDto addShoppingCartDto) {
-            
-            if(!ModelState.IsValid)
-                return BadRequest(ModelState);
-            
+        public async Task<IActionResult> Add([FromBody] AddShoppingCartDto addShoppingCartDto) 
+        {
             var userId = User.GetUserId();
-
-            var shoppingCartModel = addShoppingCartDto.ToShoppingCart(userId);
-
-            var shoppingCart = await _shoppingCartRepo.CreateAsync(shoppingCartModel);
-
-            if(shoppingCart == null) {
-                return NotFound("Couldn't find book");
-            }
-
+            await _shoppingCartService.AddAsync(addShoppingCartDto, userId);
             return Ok();
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update([FromBody] UpdateShoppingCartDto updateShoppingCartDto) {
-            if(!ModelState.IsValid)
-                return BadRequest(ModelState);
-            
+        public async Task<IActionResult> Update([FromBody] UpdateShoppingCartDto updateShoppingCartDto) 
+        {
             var userId = User.GetUserId();
-
-            var shoppingCartModel = updateShoppingCartDto.ToShoppingCart(userId);
-
-            var shoppingCart = await _shoppingCartRepo.UpdateAsync(shoppingCartModel);
-
-            if(shoppingCart == null) {
-                return NotFound("Couldn't find book");
-            }
+            await _shoppingCartService.UpdateAsync(updateShoppingCartDto, userId);
             return Ok();
         }
 
         [HttpDelete("{bookId}")]
         public async Task<IActionResult> Delete([FromRoute] Guid bookId) {
             var userId = User.GetUserId();
-
-            var shoppingCart = await _shoppingCartRepo.DeleteAsync(userId, bookId);
-
-            if(shoppingCart == null)
-                return NotFound();
-
+            await _shoppingCartService.DeleteAsync(userId, bookId);
             return NoContent();
         }
     }
