@@ -9,7 +9,7 @@ namespace BookStore.Mappers
 {
     public static class OrderDetailMappers
     {
-        public static OrderDetail ToOderDetailModel(this CreateOrderDetailDto orderDetailDto, Guid orderId) {
+        public static OrderDetail ToOderDetailFromDto(this CreateOrderDetailDto orderDetailDto, Guid orderId) {
             return new OrderDetail {
                 BookId = orderDetailDto.BookId,
                 OrderId = orderId,

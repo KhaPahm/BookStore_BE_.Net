@@ -34,10 +34,11 @@ namespace BookStore.Mappers
             };
         }
 
-        public static Order ToOrderModel(this CreateOrderNowDto orderNowDto, Guid userId) {
+        public static Order ToOrderFromDto(this CreateOrderNowDto orderNowDto, Guid userId) {
             return new Order {
                 UserNote = orderNowDto.UserNote,
                 PaymentMethod = orderNowDto.PaymentMethod,
+                PayPalTransactionId = orderNowDto.PayPalTransactionId,
                 ShippingAddress = orderNowDto.ShippingAddress,
                 UserId = userId
             };

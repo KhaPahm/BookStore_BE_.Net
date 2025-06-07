@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using BookStore.Dtos.Order;
 using BookStore.Extensions;
 using BookStore.Interfaces;
+using BookStore.Interfaces.Services;
 using BookStore.Mappers;
 using BookStore.Models;
 using BookStore.Models.ResponeApi;
@@ -24,44 +25,25 @@ namespace BookStore.Controllers.V1
         private readonly IOrderDetailRepository _orderDetailRepo;
         private readonly IShoppingCartRepository _shoppingCart;
         private readonly IPaypalService _paypalService;
+        private readonly IOrderService _orderService;
 
-        public OrderController(IOrderRepository orderRepo, IOrderDetailRepository orderDetailRepo, IShoppingCartRepository shoppingCart, IPaypalService paypalService)
+        public OrderController(IOrderService orderService)
         {
-            _orderRepo = orderRepo;
-            _orderDetailRepo = orderDetailRepo;
-            _shoppingCart = shoppingCart;
-            _paypalService = paypalService;
+            _orderService = orderService;
         }
 
         [HttpGet]
         public async Task<IActionResult> Get() {
             var userId = User.GetUserId();
-            var orders = await _orderRepo.GetAsync(userId);
-
-            var lsOrderDto = new List<OrderDto>();
-
-            foreach(var order in orders) {
-                var orderDetail = await _orderDetailRepo.GetByOrderIdAsync(order.Id);
-                lsOrderDto.Add(order.ToOrderDto(orderDetail));
-            }
-
+            var lsOrderDto = await _orderService.GetOrdersAsync(userId);
             return Ok(new ApiResponse<List<OrderDto>>(200, lsOrderDto));
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id) {
-            if(!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             var userId = User.GetUserId();
-            var order = await _orderRepo.GetByIdAsync(userId, id);
-
-            if(order == null)
-                return NotFound();
-
-            var orderDetails = await _orderDetailRepo.GetByOrderIdAsync(order.Id);
-            
-            return Ok(new ApiResponse<OrderDto>(200, order.ToOrderDto(orderDetails)));
+            var orderDto = await _orderService.GetOrderByIdAsync(userId, id);
+            return Ok(new ApiResponse<OrderDto>(200, orderDto));
         }
 
         [HttpPost("payments/excute")]
