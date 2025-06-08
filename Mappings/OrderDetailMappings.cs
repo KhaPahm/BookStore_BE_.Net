@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 using BookStore.Dtos.Order;
 using BookStore.Models;
 
-namespace BookStore.Mappers
+namespace BookStore.Mappings
 {
-    public static class OrderDetailMappers
+    public static class OrderDetailMappings
     {
-        public static OrderDetail ToOderDetailModel(this CreateOrderDetailDto orderDetailDto, Guid orderId) {
+        public static OrderDetail ToOrderDetailModel(this CreateOrderDetailDto orderDetailDto, Guid orderId) {
             return new OrderDetail {
                 BookId = orderDetailDto.BookId,
                 OrderId = orderId,
@@ -25,7 +25,7 @@ namespace BookStore.Mappers
             };
         }
 
-        public static OrderDetail ToOrderDetailFromShoppingCart(this ShoppingCart shoppingCart, Guid orderId) {
+        public static OrderDetail ToOrderDetailModel(this ShoppingCart shoppingCart, Guid orderId) {
             return new OrderDetail {
                 OrderId = orderId,
                 BookId = shoppingCart.BookId,

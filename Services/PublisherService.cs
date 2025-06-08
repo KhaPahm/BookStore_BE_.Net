@@ -6,7 +6,7 @@ using BookStore.Dtos.Publisher;
 using BookStore.Exceptions;
 using BookStore.Interfaces;
 using BookStore.Interfaces.Services;
-using BookStore.Mappers;
+using BookStore.Mappings;
 
 namespace BookStore.Services
 {
@@ -21,7 +21,7 @@ namespace BookStore.Services
 
         public async Task<PublisherDto> CreatePublisherAsync(CreatePublisherDto publisherDto)
         {
-            var publisher = publisherDto.ToPublisherFromCreateDto();
+            var publisher = publisherDto.ToPublisherModel();
             var createdPublisher = await _publisherRepo.CreateAsync(publisher);
             return createdPublisher.ToPublisherDto();
         }

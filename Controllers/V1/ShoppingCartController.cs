@@ -6,7 +6,7 @@ using BookStore.Dtos.ShoppingCart;
 using BookStore.Extensions;
 using BookStore.Interfaces;
 using BookStore.Interfaces.Services;
-using BookStore.Mappers;
+using BookStore.Mappings;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

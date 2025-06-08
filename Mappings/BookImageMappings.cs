@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using BookStore.Dtos.BookImage;
 using BookStore.Models;
 
-namespace BookStore.Mappers
+namespace BookStore.Mappings
 {
-    public static class BookImageMappers
+    public static class BookImageMappings
     {
         public static BookImageDto ToBookImageDto(this BookImage bookImage) {
             return new BookImageDto {

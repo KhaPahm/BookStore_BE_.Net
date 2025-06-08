@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using BookStore.Dtos.ShoppingCart;
 using BookStore.Models;
 
-namespace BookStore.Mappers
+namespace BookStore.Mappings
 {
-    public static class ShoppingCartMappers
+    public static class ShoppingCartMappings
     {
         public static ShoppingCartDto ToShoppingCartDto(this ShoppingCart shoppingCart) {
             return new ShoppingCartDto {
@@ -16,7 +16,7 @@ namespace BookStore.Mappers
             };
         }
 
-        public static ShoppingCart ToShoppingCart(this AddShoppingCartDto shoppingCartDto, Guid userId) {
+        public static ShoppingCart ToShoppingCartModel(this AddShoppingCartDto shoppingCartDto, Guid userId) {
             return new ShoppingCart {
                 BookId = shoppingCartDto.bookId,
                 Quantity = shoppingCartDto.Quantity,
@@ -24,7 +24,7 @@ namespace BookStore.Mappers
             };
         }
 
-        public static ShoppingCart ToShoppingCart(this UpdateShoppingCartDto shoppingCartDto, Guid userId) {
+        public static ShoppingCart ToShoppingCartModel(this UpdateShoppingCartDto shoppingCartDto, Guid userId) {
             return new ShoppingCart {
                 BookId = shoppingCartDto.bookId,
                 Quantity = shoppingCartDto.Quantity,

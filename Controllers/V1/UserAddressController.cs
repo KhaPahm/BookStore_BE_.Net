@@ -6,7 +6,7 @@ using BookStore.Dtos.UserAddress;
 using BookStore.Extensions;
 using BookStore.Interfaces;
 using BookStore.Interfaces.Services;
-using BookStore.Mappers;
+using BookStore.Mappings;
 using BookStore.Models.ResponeApi;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;

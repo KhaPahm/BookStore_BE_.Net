@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using BookStore.Dtos.ReviewImage;
 using BookStore.Interfaces;
 using BookStore.Interfaces.Services;
-using BookStore.Mappers;
+using BookStore.Mappings;
 using BookStore.Models;
 
 namespace BookStore.Services

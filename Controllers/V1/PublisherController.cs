@@ -6,7 +6,7 @@ using BookStore.Data;
 using BookStore.Dtos.Publisher;
 using BookStore.Interfaces;
 using BookStore.Interfaces.Services;
-using BookStore.Mappers;
+using BookStore.Mappings;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookStore.Controllers.V1

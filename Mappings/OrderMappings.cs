@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 using BookStore.Dtos.Order;
 using BookStore.Models;
 
-namespace BookStore.Mappers
+namespace BookStore.Mappings
 {
-    public static class OrderMappers
+    public static class OrderMappings
     {
-        public static Order ToOderFromDto(this CreateOrderDto orderDto, Guid userId) {
+        public static Order ToOrderModel(this CreateOrderDto orderDto, Guid userId) {
             return new Order {
                 UserNote = orderDto.UserNote,
                 PaymentMethod = orderDto.PaymentMethod,
@@ -34,11 +34,11 @@ namespace BookStore.Mappers
             };
         }
 
-        public static Order ToOrderFromDto(this CreateOrderNowDto orderNowDto, Guid userId) {
+        public static Order ToOrderModel(this CreateOrderNowDto orderNowDto, Guid userId) {
             return new Order {
                 UserNote = orderNowDto.UserNote,
                 PaymentMethod = orderNowDto.PaymentMethod,
-                PayPalTransactionId = orderNowDto.PayPalTransactionId,
+                // PayPalTransactionId = orderNowDto.PayPalTransactionId,
                 ShippingAddress = orderNowDto.ShippingAddress,
                 UserId = userId
             };

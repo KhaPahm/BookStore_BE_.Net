@@ -6,9 +6,9 @@ using BookStore.Dtos.Auth;
 using BookStore.Dtos.User;
 using BookStore.Models;
 
-namespace BookStore.Mappers
+namespace BookStore.Mappings
 {
-    public static class UserMappers
+    public static class UserMappings
     {
         public static UserReviewDto ToUserReviewDto(this User user) {
             return new UserReviewDto {

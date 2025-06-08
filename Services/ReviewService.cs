@@ -6,7 +6,7 @@ using BookStore.Dtos.Review;
 using BookStore.Exceptions;
 using BookStore.Interfaces;
 using BookStore.Interfaces.Services;
-using BookStore.Mappers;
+using BookStore.Mappings;
 
 namespace BookStore.Services
 {

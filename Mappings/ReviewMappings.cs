@@ -6,12 +6,14 @@ using BookStore.Dtos.Review;
 using BookStore.Models;
 using BookStore.Models.Entities;
 
-namespace BookStore.Mappers
+namespace BookStore.Mappings
 {
-    public static class ReviewMappers
+    public static class ReviewMappings
     {
-        public static ReviewDto ToReviewDto(this Review review) {
-            return new ReviewDto {
+        public static ReviewDto ToReviewDto(this Review review)
+        {
+            return new ReviewDto
+            {
                 Id = review.Id,
                 Content = review.Content,
                 Rating = review.Rating,
@@ -21,15 +23,17 @@ namespace BookStore.Mappers
             };
         }
 
-        public static Review ToReviewModel(this CreateReviewDto createReviewDto, Guid userId) {
-            return new Review {
+        public static Review ToReviewModel(this CreateReviewDto createReviewDto, Guid userId)
+        {
+            return new Review
+            {
                 Content = createReviewDto.Content,
                 Rating = createReviewDto.Rating,
                 BookId = createReviewDto.BookId,
                 UserId = userId,
             };
         }
-
+        
         public static ReviewReply ToReviewReplyModel(this CreateReviewReplyDto createReviewReplyDto, Guid userId) {
             return new ReviewReply {
                 ReviewId = createReviewReplyDto.ReviewId,
@@ -41,7 +45,7 @@ namespace BookStore.Mappers
         public static ReviewReplyDto ToReviewReplyDto(this ReviewReply reviewReply) {
             return new ReviewReplyDto {
                 Id = reviewReply.Id,
-                ReviewId = reviewReply.Id,
+                ReviewId = reviewReply.ReviewId,
                 Content = reviewReply.Content,
                 User = reviewReply.User.ToUserReviewDto()
             };

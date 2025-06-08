@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using BookStore.Dtos.Publisher;
 using BookStore.Models;
 
-namespace BookStore.Mappers
+namespace BookStore.Mappings
 {
-    public static class PublisherMappers
+    public static class PublisherMappings
     {
         public static PublisherDto ToPublisherDto(this Publisher publisher) {
             return new PublisherDto {
@@ -16,7 +16,7 @@ namespace BookStore.Mappers
             };
         }
 
-        public static Publisher ToPublisherFromCreateDto(this CreatePublisherDto publisherDto) {
+        public static Publisher ToPublisherModel(this CreatePublisherDto publisherDto) {
             return new Publisher {
                 Name = publisherDto.Name,
                 Address = publisherDto.Address,

@@ -6,7 +6,7 @@ using BookStore.Dtos.Auth;
 using BookStore.Exceptions;
 using BookStore.Interfaces;
 using BookStore.Interfaces.Services;
-using BookStore.Mappers;
+using BookStore.Mappings;
 using BookStore.Models;
 using BookStore.Static;
 using Microsoft.AspNetCore.Authentication.Cookies;

@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using BookStore.Dtos.ReviewImage;
 using BookStore.Models;
 
-namespace BookStore.Mappers
+namespace BookStore.Mappings
 {
-    public static class ReviewImageMappers
+    public static class ReviewImageMappings
     {
         public static ReviewImageDto ToReviewImageDto(this ReviewImage reviewImage) {
             return new ReviewImageDto {

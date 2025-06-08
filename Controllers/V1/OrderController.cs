@@ -6,7 +6,7 @@ using BookStore.Dtos.Order;
 using BookStore.Extensions;
 using BookStore.Interfaces;
 using BookStore.Interfaces.Services;
-using BookStore.Mappers;
+using BookStore.Mappings;
 using BookStore.Models;
 using BookStore.Models.ResponeApi;
 using BookStore.Static;
@@ -67,7 +67,7 @@ namespace BookStore.Controllers.V1
         [HttpPost("now")]
         public async Task<IActionResult> CreateNow([FromBody] CreateOrderNowDto orderDto) {
             var userId = User.GetUserId();
-            var order = orderDto.ToOrderFromDto(userId);
+            var order = orderDto.ToOrderModel(userId);
             if(orderDto.PaymentMethod.ToUpper() == PaymentMethods.Paypal) {
                 order.Status = OrderStatus.Paying;
             }
@@ -75,7 +75,7 @@ namespace BookStore.Controllers.V1
             await _orderRepo.CreateAysnc(order);
 
             var orderDetailDto = orderDto.OrderDetail;
-            var orderDetail = orderDetailDto.ToOderDetailFromDto(order.Id);
+            var orderDetail = orderDetailDto.ToOrderDetailModel(order.Id);
             await _orderDetailRepo.CreateAsync(orderDetail);
 
             var totalPrice = orderDetail.Quantity * orderDetail.PriceAtPurchase;

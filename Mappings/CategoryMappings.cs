@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using BookStore.Dtos.Category;
 using BookStore.Models;
 
-namespace BookStore.Mappers
+namespace BookStore.Mappings
 {
-    public static class CategoryMappers
+    public static class CategoryMappings
     {
         public static CategoryDto ToCategoryDto(this Category categoryModel) {
             return new CategoryDto {

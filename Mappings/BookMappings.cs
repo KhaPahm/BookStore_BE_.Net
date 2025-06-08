@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using BookStore.Dtos.Book;
 using BookStore.Models;
 
-namespace BookStore.Mappers
+namespace BookStore.Mappings
 {
-    public static class BookMappers
+    public static class BookMappings
     {
         public static Book ToBookModel(this UpdateBookDto updateBookDto) {
             return new Book {
@@ -45,9 +45,9 @@ namespace BookStore.Mappers
                 StockQuantity = book.StockQuantity,
                 PublishedDate = book.PublishedDate,
                 CreateAt = book.CreateAt,
-                Category = book.Category == null ? null : book.Category.ToCategoryDto(),
-                Publisher = book.Publisher == null ? null : book.Publisher.ToPublisherDto(),
-                Images = book.Images == null ? null : book.Images.Select(image => image.ToBookImageDto()).ToList()
+                Category = book.Category.ToCategoryDto(),
+                Publisher = book.Publisher.ToPublisherDto(),
+                Images = book.Images.Select(image => image.ToBookImageDto()).ToList()
             };
         }
     }

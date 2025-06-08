@@ -7,7 +7,7 @@ using BookStore.Dtos.Review;
 using BookStore.Extensions;
 using BookStore.Interfaces;
 using BookStore.Interfaces.Services;
-using BookStore.Mappers;
+using BookStore.Mappings;
 using BookStore.Models.Entities;
 using BookStore.Models.ResponeApi;
 using BookStore.Static;

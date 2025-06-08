@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using BookStore.Dtos.Book;
 using BookStore.Interfaces;
 using BookStore.Interfaces.Services;
-using BookStore.Mappers;
+using BookStore.Mappings;
 using BookStore.Models;
 using BookStore.Models.ResponeApi;
 using Microsoft.AspNetCore.Authorization;

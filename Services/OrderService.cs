@@ -6,7 +6,7 @@ using BookStore.Dtos.Order;
 using BookStore.Exceptions;
 using BookStore.Interfaces;
 using BookStore.Interfaces.Services;
-using BookStore.Mappers;
+using BookStore.Mappings;
 using BookStore.Static;
 
 namespace BookStore.Services
@@ -30,28 +30,29 @@ namespace BookStore.Services
         {
             var order = orderDto.ToOrderModel(userId);
             order.PaymentMethod = order.PaymentMethod.ToUpper();
-            if(order.PaymentMethod == "PAYPAL")
+            if (order.PaymentMethod == "PAYPAL")
             {
                 order.Status = OrderStatus.Paying;
             }
-        
+
             await _orderRepo.CreateAysnc(order);
 
             var orderDetailDto = orderDto.OrderDetail;
-            var orderDetail = orderDetailDto.ToOderDetailModel(order.Id);
+            var orderDetail = orderDetailDto.ToOrderDetailModel(order.Id);
             await _orderDetailRepo.CreateAsync(orderDetail);
 
             var totalPrice = orderDetail.Quantity * orderDetail.PriceAtPurchase;
             await _orderRepo.UpdateTotalPriceAsync(order.Id, totalPrice);
 
-            if(order.PaymentMethod == PaymentMethods.Paypal)
+            if (order.PaymentMethod == PaymentMethods.Paypal)
             {
                 var approvalUrl = await _paypalService.CreatePayment((decimal)totalPrice, PaypalExcute.Success, PaypalExcute.Cancel);
                 var paypalTransactionId = approvalUrl.Split("=")[1];
                 await _orderRepo.UpdatePayPalOrderId(order.Id, paypalTransactionId);
                 return approvalUrl;
             }
-
+            
+            return string.Empty;
         }
 
         public Task<bool> ExcutePaymentAsync(string paymentToken)

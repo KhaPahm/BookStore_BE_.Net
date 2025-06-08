@@ -6,7 +6,7 @@ using BookStore.Dtos.ShoppingCart;
 using BookStore.Exceptions;
 using BookStore.Interfaces;
 using BookStore.Interfaces.Services;
-using BookStore.Mappers;
+using BookStore.Mappings;
 
 namespace BookStore.Services
 {
@@ -30,7 +30,7 @@ namespace BookStore.Services
 
         public async Task<ShoppingCartDto> AddAsync(AddShoppingCartDto addShoppingCartDto, Guid userId)
         {
-            var shoppingCartModel = addShoppingCartDto.ToShoppingCart(userId);
+            var shoppingCartModel = addShoppingCartDto.ToShoppingCartModel(userId);
             var isBookExists = await _bookRepository.IsBookExistAsync(shoppingCartModel.BookId);
             if (!isBookExists)
             {
@@ -43,7 +43,7 @@ namespace BookStore.Services
 
         public async Task<ShoppingCartDto> UpdateAsync(UpdateShoppingCartDto updateShoppingCartDto, Guid userId)
         {
-            var shoppingCartModel = updateShoppingCartDto.ToShoppingCart(userId);
+            var shoppingCartModel = updateShoppingCartDto.ToShoppingCartModel(userId);
             await _shoppingCartRepository.UpdateAsync(shoppingCartModel);
             return shoppingCartModel.ToShoppingCartDto();
         }
