@@ -1,0 +1,19 @@
+# .dockerignore
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.csproj.user
+*.db
+*.mdf
+*.log
+*.git
+.gitignore
+Dockerfile
+docker-compose*
+.env
+.idea/
+.vscode/
+node_modules/
+npm-debug.log
