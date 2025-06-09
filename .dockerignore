@@ -1,19 +1,12 @@
-# .dockerignore
+# Ignore build artifacts
 bin/
 obj/
-.vs/
 *.user
 *.suo
-*.csproj.user
-*.db
-*.mdf
+
+# Ignore git and other VCS
+.git/
+
+# Ignore other temporary files
 *.log
-*.git
-.gitignore
-Dockerfile
-docker-compose*
-.env
-.idea/
-.vscode/
-node_modules/
-npm-debug.log
+
