@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text.Json;
+using BookStore.Exceptions;
 using BookStore.Models.ResponeApi;
 
 namespace BookStore.Middleware
@@ -19,18 +20,7 @@ namespace BookStore.Middleware
 
             if (context.Response.StatusCode == (int)HttpStatusCode.NotFound && !context.Response.HasStarted)
             {
-                var res = new ApiResponse<string>(
-                    Code: context.Response.StatusCode,
-                    Data: null,
-                    Message: "Resource not found",
-                    Success: false
-                );
-
-                var option = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
-                var json = JsonSerializer.Serialize(res, option);
-
-                context.Response.ContentType = "application/json";
-                await context.Response.WriteAsync(json);
+                throw new NotFoundException("Resource not found");
             }
         }
     }
