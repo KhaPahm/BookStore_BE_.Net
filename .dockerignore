@@ -1,0 +1,12 @@
+# Ignore build artifacts
+bin/
+obj/
+*.user
+*.suo
+
+# Ignore git and other VCS
+.git/
+
+# Ignore other temporary files
+*.log
+
